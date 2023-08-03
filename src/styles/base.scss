@@ -1,0 +1,9 @@
+@import "./tw.css";
+
+$background-color-base: rgb(45 45 45);
+$font-color-base: rgb(222 222 222);
+
+html, body, main {
+    background-color: $background-color-base;
+    color: $font-color-base;
+}
