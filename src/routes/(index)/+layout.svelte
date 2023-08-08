@@ -1,7 +1,3 @@
-<header class={"text-center"}>
-    MyVods
-</header>
-
-<main>
+<main class={"min-h-screen w-full flex flex-col"}>
     <slot />
 </main>

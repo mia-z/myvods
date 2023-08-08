@@ -39,8 +39,14 @@
 	"type": "module",
 	"packageManager": "yarn@3.6.1",
 	"dependencies": {
+		"@fortawesome/free-brands-svg-icons": "^6.4.2",
+		"@fortawesome/free-solid-svg-icons": "^6.4.2",
+		"@sveltestack/svelte-query": "^1.6.0",
+		"@tailwindcss/typography": "^0.5.9",
 		"axios": "^1.4.0",
+		"daisyui": "^3.5.1",
 		"es-cookie": "^1.4.0",
-		"googleapis": "^123.0.0"
+		"googleapis": "^123.0.0",
+		"svelte-fa": "^3.0.4"
 	}
 }

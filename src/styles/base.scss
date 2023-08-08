@@ -1,9 +1,29 @@
 @import "./tw.css";
 
-$background-color-base: rgb(45 45 45);
-$font-color-base: rgb(222 222 222);
+@import url("https://fonts.googleapis.com/css2?family=Lobster&family=Open+Sans:wght@400;700&family=Roboto+Flex:wght@400;700&family=Roboto+Mono&family=Wix+Madefor+Text&display=swap");
 
-html, body, main {
-    background-color: $background-color-base;
-    color: $font-color-base;
+$lobster: 'Lobster', cursive;
+$open-sans: 'Open Sans', sans-serif;
+$roboto: 'Roboto Flex', sans-serif;
+$roboto-monospace: 'Roboto Mono', monospace;
+$wix-madefor-text: 'Wix Madefor Text', sans-serif;
+
+.lobster {
+    font-family: $lobster;
+}
+
+.open-sans {
+    font-family: $open-sans;
+}
+
+.roboto {
+    font-family: $roboto;
+}
+
+.roboto-monospace {
+    font-family: $roboto-monospace;
+}
+
+.wix-madefor-text {
+    font-family: $wix-madefor-text;
 }
