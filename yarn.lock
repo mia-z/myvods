@@ -413,6 +413,34 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@prisma/client@npm:^5.1.1":
+  version: 5.1.1
+  resolution: "@prisma/client@npm:5.1.1"
+  dependencies:
+    "@prisma/engines-version": 5.1.1-1.6a3747c37ff169c90047725a05a6ef02e32ac97e
+  peerDependencies:
+    prisma: "*"
+  peerDependenciesMeta:
+    prisma:
+      optional: true
+  checksum: 0236462afc722eb6a8dc0cc53843e5f0092cfe41a5dd5e794e41ba34be4d2166ba564c21dbb3c4436111b7a40ba4f66fc1e8328d7f17cdbfb3ac616b7efd4232
+  languageName: node
+  linkType: hard
+
+"@prisma/engines-version@npm:5.1.1-1.6a3747c37ff169c90047725a05a6ef02e32ac97e":
+  version: 5.1.1-1.6a3747c37ff169c90047725a05a6ef02e32ac97e
+  resolution: "@prisma/engines-version@npm:5.1.1-1.6a3747c37ff169c90047725a05a6ef02e32ac97e"
+  checksum: cfea78fe98cff694eea31335c4167f375cdd8a848d6699bd0035d4a9c05184bf6fe57959249220c098c6214a424c9519f7cd17c51119234866840bd1030c87e1
+  languageName: node
+  linkType: hard
+
+"@prisma/engines@npm:5.1.1":
+  version: 5.1.1
+  resolution: "@prisma/engines@npm:5.1.1"
+  checksum: 561c85def110279eb7c764e7c1ea1f8f54d9a2948ed5e5db9b11321c2bef362d178b756e39e7e022ee27cb2be5ac8d9b835967ce341ad8f6a1e8502f988140ee
+  languageName: node
+  linkType: hard
+
 "@sinclair/typebox@npm:^0.27.8":
   version: 0.27.8
   resolution: "@sinclair/typebox@npm:0.27.8"
@@ -557,6 +585,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/luxon@npm:^3.3.1":
+  version: 3.3.1
+  resolution: "@types/luxon@npm:3.3.1"
+  checksum: da8f6158edacae1430f3eca5f4ab4891200ffb34aa521ef6bae407a3c50b3854907098bc4535fb2a66a2779738f3c6c48fdfd86f01117a6f4844b18536cdb7c0
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:*":
   version: 20.4.6
   resolution: "@types/node@npm:20.4.6"
@@ -575,6 +610,13 @@ __metadata:
   version: 7.5.0
   resolution: "@types/semver@npm:7.5.0"
   checksum: 0a64b9b9c7424d9a467658b18dd70d1d781c2d6f033096a6e05762d20ebbad23c1b69b0083b0484722aabf35640b78ccc3de26368bcae1129c87e9df028a22e2
+  languageName: node
+  linkType: hard
+
+"@types/uuid@npm:^9.0.2":
+  version: 9.0.2
+  resolution: "@types/uuid@npm:9.0.2"
+  checksum: 1754bcf3444e1e3aeadd6e774fc328eb53bc956665e2e8fb6ec127aa8e1f43d9a224c3d22a9a6233dca8dd81a12dc7fed4d84b8876dd5ec82d40f574f7ff8b68
   languageName: node
   linkType: hard
 
@@ -2652,6 +2694,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"luxon@npm:^3.4.0":
+  version: 3.4.0
+  resolution: "luxon@npm:3.4.0"
+  checksum: ca9b6d0e0a8d156574b7e84014ac8e4b60d116d6d7a0fb65ef48eeb8e4415dad6350b76c5ee34f795cadf8b3f9a5fe7a6885733f561e554c50dffb0b704a840b
+  languageName: node
+  linkType: hard
+
 "magic-string@npm:^0.27.0":
   version: 0.27.0
   resolution: "magic-string@npm:0.27.0"
@@ -2925,10 +2974,13 @@ __metadata:
     "@fortawesome/free-brands-svg-icons": ^6.4.2
     "@fortawesome/free-solid-svg-icons": ^6.4.2
     "@playwright/test": ^1.28.1
+    "@prisma/client": ^5.1.1
     "@sveltejs/adapter-auto": ^2.0.0
     "@sveltejs/kit": ^1.20.4
     "@sveltestack/svelte-query": ^1.6.0
     "@tailwindcss/typography": ^0.5.9
+    "@types/luxon": ^3.3.1
+    "@types/uuid": ^9.0.2
     "@typescript-eslint/eslint-plugin": ^5.45.0
     "@typescript-eslint/parser": ^5.45.0
     autoprefixer: ^10.4.14
@@ -2939,9 +2991,11 @@ __metadata:
     eslint-config-prettier: ^8.5.0
     eslint-plugin-svelte: ^2.30.0
     googleapis: ^123.0.0
+    luxon: ^3.4.0
     postcss: ^8.4.27
     prettier: ^2.8.0
     prettier-plugin-svelte: ^2.10.1
+    prisma: ^5.1.1
     sass: ^1.64.2
     svelte: ^4.0.5
     svelte-check: ^3.4.3
@@ -2949,8 +3003,10 @@ __metadata:
     tailwindcss: ^3.3.3
     tslib: ^2.4.1
     typescript: ^5.0.0
+    uuid: ^9.0.0
     vite: ^4.4.2
     vitest: ^0.32.2
+    zod: ^3.21.4
   languageName: unknown
   linkType: soft
 
@@ -3449,6 +3505,17 @@ __metadata:
     ansi-styles: ^5.0.0
     react-is: ^18.0.0
   checksum: a0f972a44f959023c0df9cdfe9eed7540264d7f7ddf74667db8a5294444d5aa153fd47d20327df10ae86964e2ceec10e46ea06b1a5c9c12e02348b78c952c9fc
+  languageName: node
+  linkType: hard
+
+"prisma@npm:^5.1.1":
+  version: 5.1.1
+  resolution: "prisma@npm:5.1.1"
+  dependencies:
+    "@prisma/engines": 5.1.1
+  bin:
+    prisma: build/index.js
+  checksum: ab0879fdff3a5e3f50956e18308bd996708519824802b2528c80d1639bbb4d8dd499ef17670db27986695811a9e28b2c9d5ab0753031441ee12878b30bace8b7
   languageName: node
   linkType: hard
 
@@ -4576,5 +4643,12 @@ __metadata:
   version: 1.0.0
   resolution: "yocto-queue@npm:1.0.0"
   checksum: 2cac84540f65c64ccc1683c267edce396b26b1e931aa429660aefac8fbe0188167b7aee815a3c22fa59a28a58d898d1a2b1825048f834d8d629f4c2a5d443801
+  languageName: node
+  linkType: hard
+
+"zod@npm:^3.21.4":
+  version: 3.21.4
+  resolution: "zod@npm:3.21.4"
+  checksum: f185ba87342ff16f7a06686767c2b2a7af41110c7edf7c1974095d8db7a73792696bcb4a00853de0d2edeb34a5b2ea6a55871bc864227dace682a0a28de33e1f
   languageName: node
   linkType: hard

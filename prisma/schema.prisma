@@ -1,0 +1,46 @@
+datasource db {
+    provider            = "postgresql"
+    url             	= env("DATABASE_URL")
+    directUrl           = env("DIRECT_URL")
+    shadowDatabaseUrl   = env("SHADOW_DATABASE_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model User {
+    id                  Int @id @default(autoincrement())
+    displayName         String
+    oauthConnections    OAuthConnection[]
+    tokens              LoginToken[]
+}
+
+model LoginToken {
+    id          Int @id @default(autoincrement())
+    token       String
+    expires     DateTime
+    userId      Int
+    user        User @relation(fields: [userId], references: [id])
+}
+
+model OAuthConnection {
+    id              Int @id @default(autoincrement())
+    accountId       String
+    authCode        String
+    refreshToken    String
+    userId          Int
+    user            User @relation(fields: [userId], references: [id])
+    provider        Provider
+}
+
+model Vod {
+    id              Int @id @default(autoincrement())
+    provider        Provider
+    link            String
+}
+
+enum Provider {
+    GOOGLE
+    TWITCH
+}

@@ -4,11 +4,12 @@
     import { PUBLIC_GOOGLE_CLIENT_ID, PUBLIC_GOOGLE_AUTH_CALLBACK_URI } from "$env/static/public";
 
     const scopes = [
-        "https://www.googleapis.com/auth/youtube.readonly"
+        "https://www.googleapis.com/auth/youtube.readonly",
+        "https://www.googleapis.com/auth/userinfo.profile"
     ];
 
     const url = new URL("https://accounts.google.com/o/oauth2/v2/auth");
-    url.searchParams.append("scope", scopes.join(","));
+    url.searchParams.append("scope", scopes.join(" "));
     url.searchParams.append("access_type", "offline");
     url.searchParams.append("include_granted_scopes", "true");
     url.searchParams.append("response_type", "code");

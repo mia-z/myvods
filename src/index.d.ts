@@ -1,3 +1,28 @@
+declare namespace Google {
+    interface Person {
+        resourceName: string;
+        etag: string;
+        names: PersonName[]
+    }
+    interface PersonName {
+        metadata: PersonNameMetadata;
+        displayName: string;
+        familyName: string;
+        givenName: string;
+        displayNameLastFirst: string;
+        unstructuredName: string;
+    }
+    interface PersonNameMetadata {
+        primary?: boolean;
+        source: PersonNameMetadataSource;
+        sourcePrimary?: boolean;
+    }
+    interface PersonNameMetadataSource {
+        type: string;
+        id: string;
+    }
+}
+
 declare namespace Youtube {
     //Common and base
 	interface YoutubeBaseObject {

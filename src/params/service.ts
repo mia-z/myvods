@@ -1,3 +1,3 @@
 export function match(param: string) {
-    return /twitch|youtube/.test(param);
+    return /twitch|google/.test(param);
 }

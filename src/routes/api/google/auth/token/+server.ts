@@ -3,21 +3,11 @@ import { SECRET_GOOGLE_CLIENT_SECRET } from "$env/static/private";
 import { PUBLIC_GOOGLE_AUTH_CALLBACK_URI, PUBLIC_GOOGLE_CLIENT_ID } from "$env/static/public";
 import axios from "axios";
 
-type YoutubeTokenRes = {
-    tokens: {
-        access_token: string,
-        expires_in: number,
-        token_type: "Bearer",
-        scope: string,
-        refresh_token?: string
-    }
-}
-
-export const GET = async ({ cookies }) => {
-    const code = cookies.get("google_code");
+export const GET = async ({ url }) => {
+    const code = url.searchParams.get("code");
 
     if (!code) {
-        throw error(400, new Error("No code cookie"));
+        throw error(400, new Error("No code param"));
     }
 
     const params = new URLSearchParams();
