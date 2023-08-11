@@ -3,7 +3,7 @@ import { SECRET_GOOGLE_CLIENT_SECRET } from "$env/static/private";
 import { PUBLIC_GOOGLE_AUTH_CALLBACK_URI, PUBLIC_GOOGLE_CLIENT_ID } from "$env/static/public";
 import axios from "axios";
 
-export const GET = async ({ url }) => {
+export const POST = async ({ url }) => {
     const code = url.searchParams.get("code");
 
     if (!code) {

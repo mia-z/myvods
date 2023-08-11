@@ -1,7 +1,9 @@
-import { error, json, text } from "@sveltejs/kit";
+import { json, text } from "@sveltejs/kit";
 import prisma from "$lib/server/Prisma";
 import { z } from "zod";
 import { v4 as uuid } from "uuid";
+import { DateTime } from "luxon";
+
 
 const newUserRequest = z.object({
     displayName: z.string().nonempty(),
@@ -34,7 +36,7 @@ export const POST = async ({ request }) => {
                 tokens: {
                     create: {
                         token: uuid(),
-                        expires: new Date().toISOString()
+                        expires: DateTime.now().plus({ days: 7 }).toString(),
                     }
                 }
             },
@@ -42,12 +44,16 @@ export const POST = async ({ request }) => {
                 displayName: true,
                 id: true,
                 oauthConnections: true,
-                tokens: true
+                tokens: {
+                    orderBy: {
+                        id: "desc"
+                    },
+                    take: 1
+                }
             }
         });
-
         return json(userCreateRes);
     } else {
-        return text("Couldnt validate body", { status: 400 })
+        return text("Couldnt validate body", { status: 400 });
     }
 }

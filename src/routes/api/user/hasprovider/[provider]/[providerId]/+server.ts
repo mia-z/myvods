@@ -22,11 +22,19 @@ export const GET = async ({ params }) => {
                 }
             },
             select: {
-                user: true
+                user: {
+                    include: {
+                        oauthConnections: true,
+                    }
+                }
             }
         });
         
-        return json(user);
+        if (user) {
+            return json(user.user);
+        } else {
+            return text("no provider found for this oauth", { status: 404 });
+        }
     } else {
         throw error(400, "Unexpected provider: " + provider);
     }

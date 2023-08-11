@@ -11,11 +11,11 @@ type TwitchTokenRes = {
     token_type: "bearer"
 }
 
-export const GET = async ({ cookies }) => {
-    const code = cookies.get("twitch_code");
+export const POST = async ({ url }) => {
+    const code = url.searchParams.get("code");
 
     if (!code) {
-        throw error(400, new Error("No code cookie"));
+        throw error(400, new Error("No code param"));
     }
 
     const params = new URLSearchParams();
