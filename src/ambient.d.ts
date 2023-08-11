@@ -9,20 +9,15 @@ declare type YoutubeTokenRes = {
 type TwitchTokenRes = {
     access_token: string,
     expires_in: number,
-    token_type: "Bearer",
-    scope: string,
+    token_type: "bearer",
+    scope?: string[],
     refresh_token: string
 }
 
-type TwitchValidateRes = {
+type TwitchTokenUser = {
     client_id: string,
     login: string,
-    scopes: string[],
+    scopes?: string[] | null | undefined,
     user_id: string,
     expires_in: number
-}
-
-type TwitchUser = {
-    login: string,
-    userId: string
 }
