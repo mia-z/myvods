@@ -1,6 +1,5 @@
 import axios from "axios";
-import { writable } from "svelte/store";
-import * as Cookies from "es-cookie";
+import { writable, derived } from "svelte/store";
 
 type GoogleTokenRes = {
     access_token: string,
@@ -21,28 +20,14 @@ const createAuthStore = () => {
 
 	return {
 		subscribe,
-        init: async () => {
-            const refresh = Cookies.get("google_refresh");
-            if (refresh) {
-                const refreshRes = await axios.post<GoogleTokenRes>(`/api/google/auth/refresh?refresh_token=${refresh}`);
-                console.log("GOOGLE TOKEN REFRESH");
-                console.log(refreshRes.data);
-                return set({
-                    token: refreshRes.data.access_token,
-                    expire: refreshRes.data.expires_in,
-                    refresh: refreshRes.data.refresh_token
-                });
-            } else {
-                const tokenRes = await axios.get<GoogleTokenRes>("/api/google/auth/token");
-                console.log("NEW GOOGLE TOKEN");
-                console.log(tokenRes.data);
-                Cookies.set("google_refresh", tokenRes.data.refresh_token);
-                return set({
-                    token: tokenRes.data.access_token,
-                    expire: tokenRes.data.expires_in,
-                    refresh: tokenRes.data.refresh_token
-                });
-            }
+        init: async (refreshToken: string) => {
+            const refreshRes = await axios.post<GoogleTokenRes>(`/api/google/auth/refresh?refresh_token=${refreshToken}`);
+            console.log(refreshRes.data);
+            return set({
+                token: refreshRes.data.access_token,
+                expire: refreshRes.data.expires_in,
+                refresh: refreshRes.data.refresh_token
+            });
         },
         setToken: (token: string) => update((s) => { return { ...s, token} }),
         setRefresh: (refresh: string) => update((s) => { return { ...s, refresh} }),
@@ -52,3 +37,11 @@ const createAuthStore = () => {
 }
 
 export const GoogleAuth = createAuthStore();
+export const GoogleRestClient = derived(GoogleAuth, ($state) => {
+    return axios.create({
+        headers: {
+            "Authorization": `Bearer ${$state.token}`
+        },
+        baseURL: "https://www.googleapis.com/youtube/v3"
+    });
+});
