@@ -63,7 +63,7 @@ const setupTwitchAuth = async (code: string) => {
 const getTokenFromCode = async (code: string): Promise<TwitchTokenRes> => {
     const res = await axios.post<TwitchTokenRes>(`/api/twitch/auth/token?code=${code}`);
     if (res.status !== 200) {
-        throw new Error("Didnt get 200 when fetching token from auth_code");
+        throw new Error("Didnt get 200 when fetching token with auth_code");
     } else {
         return res.data;
     }
@@ -99,7 +99,7 @@ const validatedTwitchUserData = (twitchUser: TwitchTokenUser): TwitchTokenUser =
         return validated.data;
     } else {
         console.log(twitchUser);
-        console.log(validated.error.errors)
+        console.log(validated.error.errors);
         throw new Error("Failed to validate twitchUserData from Twitch via new token");
     }
 }

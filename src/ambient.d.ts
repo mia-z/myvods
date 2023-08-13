@@ -1,8 +1,8 @@
-declare type YoutubeTokenRes = {
+type OAuthTokenPayload = {
     access_token: string,
     expires_in: number,
-    token_type: "Bearer",
-    scope: string,
+    token_type: "Bearer" | "bearer",
+    scope?: string | string[] | null,
     refresh_token?: string
 }
 
