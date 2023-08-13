@@ -17,7 +17,7 @@ export const POST = async ({ url }) => {
     params.append("redirect_uri", PUBLIC_GOOGLE_AUTH_CALLBACK_URI);
     params.append("grant_type", "authorization_code");
 
-    const res = await axios.post<YoutubeTokenRes>("https://oauth2.googleapis.com/token", params, {
+    const res = await axios.post<OAuthTokenPayload>("https://oauth2.googleapis.com/token", params, {
         headers: {
             "Content-Type": "application/x-www-form-urlencoded"
         }
@@ -26,7 +26,6 @@ export const POST = async ({ url }) => {
     if (res.status === 200) {
         return json(res.data);
     } else {
-        console.log("Didnt get 200 from google when getting new token");
-        throw error(400, new Error("Didnt get 200 from google when getting new token")); 
+        throw error(res.status, "Didnt get 200 from Google when getting new token with auth_code"); 
     }
 }

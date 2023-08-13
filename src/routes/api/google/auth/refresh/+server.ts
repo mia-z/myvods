@@ -22,13 +22,11 @@ export const POST = async ({ url }) => {
         },
         validateStatus: () => true
     });
-    
+
     if (res.status === 200) {
         return json(res.data);
     } else {
-        console.log("Refresh failed with");
-        console.log(res.data)
-        throw error(res.status, "")
+        throw error(res.status, "Didnt get 200 when refreshing Google token!");
     }
 
 

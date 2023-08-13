@@ -18,5 +18,10 @@ export const POST = async ({ url }) => {
             "Content-Type": "application/x-www-form-urlencoded"
         }
     });
+
+    if (res.status !== 200) {
+        throw error(res.status, "Didnt get OK when trying to revoke Twitch token");
+    }
+
     return text("ok");
 }

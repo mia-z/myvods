@@ -16,5 +16,10 @@ export const POST = async ({ url }) => {
             "Content-Type": "application/x-www-form-urlencoded"
         }
     });
+
+    if (res.status !== 200) {
+        throw error(res.status, "Didnt get 200 from Google when revoking token!");
+    }
+
     return text("ok");
 }

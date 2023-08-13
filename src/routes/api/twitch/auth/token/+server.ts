@@ -26,15 +26,15 @@ export const POST = async ({ url }) => {
     params.append("grant_type", "authorization_code");
 
     const res = await axios.post<TwitchTokenRes>("https://id.twitch.tv/oauth2/token", params, {
+        validateStatus: () => true,
         headers: {
             "Content-Type": "application/x-www-form-urlencoded"
-        }
+        },
     });
 
     if (res.status === 200) {
         return json(res.data);
     } else {
-        console.log("Didnt get 200 from twitch when getting new token");
-        throw error(400, new Error("Didnt get 200 from twitch when getting new token")); 
+        throw error(res.status, "Didnt get 200 from twitch when getting new token with auth_code"); 
     }
 }
