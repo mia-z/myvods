@@ -32,7 +32,6 @@
             } else {
                 loginError = "Unknown error!"
             }
-            
         }
     });
 
