@@ -1,5 +1,5 @@
 import { error, text } from "@sveltejs/kit";
-import axios from "axios";
+import axios from "$lib/server/AxiosClient";
 import { PUBLIC_TWITCH_CLIENT_ID } from "$env/static/public";
 
 export const POST = async ({ url }) => {

@@ -1,5 +1,5 @@
 import { error, text } from "@sveltejs/kit";
-import axios from "axios";
+import axios from "$lib/server/AxiosClient";
 
 export const POST = async ({ url }) => {
     const token = url.searchParams.get("token");

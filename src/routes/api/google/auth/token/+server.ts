@@ -1,7 +1,7 @@
 import { error, json } from "@sveltejs/kit";
 import { SECRET_GOOGLE_CLIENT_SECRET } from "$env/static/private";
-import { PUBLIC_GOOGLE_AUTH_CALLBACK_URI, PUBLIC_GOOGLE_CLIENT_ID } from "$env/static/public";
-import axios from "axios";
+import { PUBLIC_GOOGLE_AUTH_CALLBACK_URI_NEW, PUBLIC_GOOGLE_CLIENT_ID } from "$env/static/public";
+import axios from "$lib/server/AxiosClient";
 
 export const POST = async ({ url }) => {
     const code = url.searchParams.get("code");
@@ -14,7 +14,7 @@ export const POST = async ({ url }) => {
     params.append("code", code);
     params.append("client_id", PUBLIC_GOOGLE_CLIENT_ID);
     params.append("client_secret", SECRET_GOOGLE_CLIENT_SECRET);
-    params.append("redirect_uri", PUBLIC_GOOGLE_AUTH_CALLBACK_URI);
+    params.append("redirect_uri", PUBLIC_GOOGLE_AUTH_CALLBACK_URI_NEW);
     params.append("grant_type", "authorization_code");
 
     const res = await axios.post<OAuthTokenPayload>("https://oauth2.googleapis.com/token", params, {
