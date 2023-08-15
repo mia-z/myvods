@@ -4,10 +4,10 @@
     import { onMount } from "svelte";
     import * as Cookies from "es-cookie";
 	import { goto } from "$app/navigation";
-	import { useQuery } from "@sveltestack/svelte-query";
     import axios from "axios";
-	import { fade } from "svelte/transition";
 	import { UserData } from "$stores/User.store";
+    import { faRightFromBracket, faUserGear } from "@fortawesome/free-solid-svg-icons";
+    import Fa from "svelte-fa";
 
     onMount(async () => {
         const uuidCookie = Cookies.get("user");
@@ -38,10 +38,12 @@
     }
 
     const onSignOutClick = async () => {
-        const signOutRes = await axios.post(`/api/google/auth/revoke?token=${$GoogleAuth.token}`, null, {
-            validateStatus: () => true
-        });
+        Cookies.remove("user");
         goto("/");
+    }
+
+    const onUserSettingsClick = () => {
+        goto("/app/profile");
     }
 </script>
 
@@ -56,11 +58,12 @@
             {$UserData?.displayName}
         </div>
     </div>
-    <div class={"col-start-5 col-span-1 flex "}>
-        <button on:click={onSignOutClick} class={"m-auto btn btn-secondary btn-sm rounded-full"}>
-            <div>
-                Sign out
-            </div>
+    <div class={"col-start-5 col-span-1 flex flex-row justify-end mr-5 space-x-2"}>
+        <button on:click={onUserSettingsClick} class={"my-auto btn btn-base btn-sm rounded-full"}>
+            <Fa icon={faUserGear} />
+        </button>
+        <button on:click={onSignOutClick} class={"my-auto btn btn-base btn-sm rounded-full"}>
+            <Fa icon={faRightFromBracket} />
         </button>
     </div>
 </header>
