@@ -1,7 +1,6 @@
 import { error, json } from "@sveltejs/kit";
 import prisma from "$lib/server/Prisma";
 
-
 export const GET = async ({ params }) => {
     const token = params.token;
 

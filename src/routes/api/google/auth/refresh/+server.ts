@@ -1,5 +1,5 @@
 import { error, json } from "@sveltejs/kit";
-import axios from "axios";
+import axios from "$lib/server/AxiosClient";
 import { SECRET_GOOGLE_CLIENT_SECRET } from "$env/static/private";
 import { PUBLIC_GOOGLE_CLIENT_ID } from "$env/static/public";
 
@@ -28,6 +28,4 @@ export const POST = async ({ url }) => {
     } else {
         throw error(res.status, "Didnt get 200 when refreshing Google token!");
     }
-
-
 }
