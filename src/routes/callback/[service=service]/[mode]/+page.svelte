@@ -8,7 +8,7 @@
 	import { setupTwitchAuth } from "$lib/TwitchAuthHelper";
 	import { AxiosError } from "axios";
 
-    let service: string = $page.params.page;
+    let { mode, service } = $page.params;
 
     let loginError: string | null = null;
 
@@ -21,13 +21,14 @@
 
         try {
             switch (service) {
-                case "google": await setupGoogleAuth(code); break;
-                case "twitch": await setupTwitchAuth(code); break;
+                case "google": await setupGoogleAuth(code, mode); break;
+                case "twitch": await setupTwitchAuth(code, mode); break;
                 default: throw new Error("Unsupported OAuth provider (This shouldnt ever happen lol)");
             }
         } catch (e) {
             if (e instanceof AxiosError) {
-                console.log( e.response?.data)
+                console.log( e);
+                console.log( e.response?.data);
                 loginError = e.response?.data?.message
             } else {
                 loginError = "Unknown error!"
@@ -53,7 +54,7 @@
             </div>
         {:else}
             <div class={"mx-auto text-xl"}>
-                Logging in via&nbsp;<span class={"font-bold capitalize"}>{service}</span>
+                Setting up auth for&nbsp;<span class={"font-bold capitalize"}>{service}</span>
             </div>
             <Fa icon={faSpinner} class={"text-2xl animate-spin"} />
         {/if}
