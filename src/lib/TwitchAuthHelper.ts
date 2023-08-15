@@ -36,7 +36,7 @@ const TwitchUserResponseSchema = z.object({
     login: z.string().nonempty(),
 });
 
-const setupTwitchAuth = async (code: string) => {
+const setupTwitchAuth = async (code: string, mode: string) => {
     const tokenRes = await getTokenFromCode(code);
 
     const validatedTokenObject = validateTokenResponse(tokenRes);
@@ -58,6 +58,8 @@ const setupTwitchAuth = async (code: string) => {
             refreshToken: validatedTokenObject.refresh_token
         });
     }
+
+    return goto(mode === "link" ? "/app/profile" : "/app");
 }
 
 const getTokenFromCode = async (code: string): Promise<TwitchTokenRes> => {
@@ -121,7 +123,6 @@ const createNewUser = async (newUser: CreateNewUserRequest) => {
         validateStatus: () => true
     });
     Cookies.set("user", createUserRes.data.tokens[0].token);
-    return goto("/app");
 }
 
 const generateUserToken = async (userId: number) => {
@@ -129,7 +130,6 @@ const generateUserToken = async (userId: number) => {
         validateStatus: () => true
     });
     Cookies.set("user", newTokenRes.data);
-    return goto("/app");
 }
 
 export {
