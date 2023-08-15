@@ -40,7 +40,7 @@ const GoogleUserResponseSchema = z.object({
     displayName: z.string()
 });
 
-const setupGoogleAuth = async (code: string) => {
+const setupGoogleAuth = async (code: string, mode: string) => {
     const tokenRes = await getTokenFromCode(code);
 
     const validatedToken = validateOAuthTokenPayload(tokenRes);
@@ -62,6 +62,8 @@ const setupGoogleAuth = async (code: string) => {
             refreshToken: tokenRes.refresh_token as string
         });
     }
+
+    return goto(mode === "link" ? "/app/profile" : "/app");
 }
 
 const getTokenFromCode = async (code: string): Promise<OAuthTokenPayload> => {
@@ -133,7 +135,6 @@ const createNewUser = async (newUser: CreateNewUserRequest) => {
         validateStatus: () => true
     });
     Cookies.set("user", createUserRes.data.tokens[0].token);
-    return goto("/app");
 }
 
 const generateUserToken = async (userId: number) => {
@@ -141,7 +142,6 @@ const generateUserToken = async (userId: number) => {
         validateStatus: () => true
     });
     Cookies.set("user", newTokenRes.data);
-    return goto("/app");
 }
 
 export {
