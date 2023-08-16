@@ -4,6 +4,7 @@ import type { Prisma } from "@prisma/client";
 import { goto } from "$app/navigation";
 import { z } from "zod";
 import { PUBLIC_TWITCH_CLIENT_ID } from "$env/static/public";
+import { trpc } from "$trpc/client";
 
 type User = Prisma.UserGetPayload<{
     include: {
@@ -48,7 +49,7 @@ const setupTwitchAuth = async (code: string, mode: string) => {
     const internalUserData = await checkUserExists(validatedTwitchUserObject);
 
     if (internalUserData) {
-        await generateUserToken(internalUserData.id);
+        await generateUserToken(internalUserData.user.id);
     } else {
         await createNewUser({
             displayName: validatedTwitchUserObject.login,
@@ -63,12 +64,7 @@ const setupTwitchAuth = async (code: string, mode: string) => {
 }
 
 const getTokenFromCode = async (code: string): Promise<TwitchTokenRes> => {
-    const res = await axios.post<TwitchTokenRes>(`/api/twitch/auth/token?code=${code}`);
-    if (res.status !== 200) {
-        throw new Error("Didnt get 200 when fetching token with auth_code");
-    } else {
-        return res.data;
-    }
+    return await trpc().twitch.token.query(code);
 }
 
 const validateTokenResponse = (tokenResponseObject: TwitchTokenRes): TwitchTokenRes => {
@@ -100,36 +96,22 @@ const validatedTwitchUserData = (twitchUser: TwitchTokenUser): TwitchTokenUser =
     if (validated.success) {
         return validated.data;
     } else {
-        console.log(twitchUser);
-        console.log(validated.error.errors);
         throw new Error("Failed to validate twitchUserData from Twitch via new token");
     }
 }
 
-const checkUserExists = async (tokenUser: TwitchTokenUser): Promise<User | null> => {
-    const internalUserRes = await axios.get<User>(`/api/user/hasprovider/twitch/${tokenUser.user_id}`, {
-        validateStatus: () => true
-    });
-
-    if (internalUserRes.status === 200) {
-        return internalUserRes.data;
-    } else {
-        return null;
-    }
+const checkUserExists = async (tokenUser: TwitchTokenUser) => {
+    return await trpc().user.getByOAuthProviderId.query({ accountId: tokenUser.user_id, provider: "TWITCH" })
 }
 
 const createNewUser = async (newUser: CreateNewUserRequest) => {
-    const createUserRes = await axios.post<User>("/api/user", JSON.stringify(newUser), {
-        validateStatus: () => true
-    });
-    Cookies.set("user", createUserRes.data.tokens[0].token);
+    const createUserRes = await trpc().user.createNewUserWithOAuth.mutate(newUser);
+    Cookies.set("user", createUserRes.tokens[0].token);
 }
 
 const generateUserToken = async (userId: number) => {
-    const newTokenRes = await axios.get<string>(`/api/user/${userId}/newtoken`, {
-        validateStatus: () => true
-    });
-    Cookies.set("user", newTokenRes.data);
+    const newToken = await trpc().user.generateUserToken.mutate(userId);
+    Cookies.set("user", newToken);
 }
 
 export {

@@ -11,7 +11,9 @@ const config = {
             "$styles": "./src/styles/*",
             "$components": "./src/components/*",
             "$stores": "./src/stores/*",
-            "$trpcroutes": "./src/lib/trpc/routes/*"
+            "$trpcroutes": "./src/lib/trpc/routes/*",
+            "$trpc": "./src/lib/trpc/*",
+            "$trpcmiddleware": "./src/lib/trpc/middleware/*"
         }
 	}
 };

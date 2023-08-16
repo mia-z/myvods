@@ -7,6 +7,7 @@
 	import { setupGoogleAuth } from "$lib/GoogleAuthHelper";
 	import { setupTwitchAuth } from "$lib/TwitchAuthHelper";
 	import { AxiosError } from "axios";
+	import { TRPCClientError } from "@trpc/client";
 
     let { mode, service } = $page.params;
 
@@ -27,9 +28,12 @@
             }
         } catch (e) {
             if (e instanceof AxiosError) {
-                console.log( e);
-                console.log( e.response?.data);
+                console.log(e);
+                console.log(e.response?.data);
                 loginError = e.response?.data?.message
+            } if (e instanceof TRPCClientError) {
+                console.log(e)
+                loginError = e.message
             } else {
                 loginError = "Unknown error!"
             }
