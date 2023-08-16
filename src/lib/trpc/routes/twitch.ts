@@ -41,7 +41,7 @@ export const twitch = router({
             params.append("refresh_token", encodedRefreshToken);
             params.append("grant_type", "refresh_token");
 
-            const res = await axios.post("https://id.twitch.tv/oauth2/token", params, {
+            const res = await axios.post<OAuthTokenPayload>("https://id.twitch.tv/oauth2/token", params, {
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded"
                 }
@@ -49,7 +49,6 @@ export const twitch = router({
 
             if (res.status === 200) {
                 return res.data;
-                
             } else {
                 throw new TRPCError({
                     code: "INTERNAL_SERVER_ERROR",

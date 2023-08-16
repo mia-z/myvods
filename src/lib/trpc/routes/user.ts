@@ -1,9 +1,9 @@
 import { z } from "zod";
 import prisma from "$lib/server/Prisma";
 import { router, publicProcedure } from "../t";
-import { TRPCError } from "@trpc/server";
 import { v4 as uuid } from "uuid";
 import { DateTime } from "luxon";
+import { TRPCError } from "@trpc/server";
 
 export const user = router({
     getById: publicProcedure
@@ -22,18 +22,18 @@ export const user = router({
     getByUUIDToken: publicProcedure
         .input(z.string())
         .query(async ({ input }) => {
-            return await prisma.loginToken.findFirst({
+            return await prisma.user.findFirstOrThrow({
                 include: {
-                    user: {
-                        include: {
-                            oauthConnections: true
-                        }
-                    }
+                    oauthConnections: true
                 },
                 where: {
-                    token: input,
+                    tokens: {
+                        some: {
+                            token: input
+                        }
+                    }
                 }
-            });
+            })
         }),
     getByOAuthProviderId: publicProcedure
         .input(z.object({
@@ -90,9 +90,13 @@ export const user = router({
                         }
                     }
                 });
-                newTokenRes.tokens[0].token;
+                return newTokenRes.tokens[0].token;
             } else {
-                return null;
+                throw new TRPCError({
+                    code: "BAD_REQUEST",
+                    message: `Couldnt find user associated with uuid: ${input}`,
+                    cause: "Prisma/Server"
+                });
             }
         }),
     createNewUserWithOAuth: publicProcedure

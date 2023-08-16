@@ -15,7 +15,7 @@
             console.log("No uuid cookie, cya");
             goto("/");
         } else {
-            await UserData.init();
+            await UserData.init(uuidCookie);
         }
     });
 

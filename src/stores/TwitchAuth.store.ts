@@ -1,13 +1,6 @@
+import { trpc } from "$trpc/client";
 import axios from "axios";
 import { derived, writable } from "svelte/store";
-
-type TwitchTokenRes = {
-    access_token: string,
-    expires_in: number,
-    token_type: "Bearer",
-    scope: string,
-    refresh_token: string
-}
 
 type TwitchAuthState = {
     token: string,
@@ -27,13 +20,13 @@ const createAuthStore = () => {
 	return {
 		subscribe,
         init: async (refresh: string) => {
-            const refreshRes = await axios.post<TwitchTokenRes>(`/api/twitch/auth/refresh?refresh_token=${refresh}`);
-            console.log(refreshRes.data);
+            const refreshRes = await trpc().twitch.refresh.query(refresh);
+            console.log(refreshRes);
             return update((state) => { return {
                 ...state,
-                token: refreshRes.data.access_token,
-                expire: refreshRes.data.expires_in,
-                refresh: refreshRes.data.refresh_token,
+                token: refreshRes.access_token,
+                expire: refreshRes.expires_in,
+                refresh: refreshRes.refresh_token as string,
             }});
         },
         setToken: (token: string) => update((s) => { return { ...s, token} }),

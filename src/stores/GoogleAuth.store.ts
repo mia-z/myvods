@@ -1,6 +1,6 @@
 import axios from "axios";
 import { writable, derived } from "svelte/store";
-
+import { trpc } from "$trpc/client";
 type GoogleTokenRes = {
     access_token: string,
     expires_in: number,
@@ -21,12 +21,12 @@ const createAuthStore = () => {
 	return {
 		subscribe,
         init: async (refreshToken: string) => {
-            const refreshRes = await axios.post<GoogleTokenRes>(`/api/google/auth/refresh?refresh_token=${refreshToken}`);
-            console.log(refreshRes.data);
+            const refreshRes = await trpc().google.refresh.query(refreshToken);
+            console.log(refreshRes);
             return set({
-                token: refreshRes.data.access_token,
-                expire: refreshRes.data.expires_in,
-                refresh: refreshRes.data.refresh_token
+                token: refreshRes.access_token,
+                expire: refreshRes.expires_in,
+                refresh: refreshRes.refresh_token as string
             });
         },
         setToken: (token: string) => update((s) => { return { ...s, token} }),

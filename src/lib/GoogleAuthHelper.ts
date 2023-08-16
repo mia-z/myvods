@@ -1,16 +1,9 @@
 import * as Cookies from "es-cookie";
 import axios from "axios";
 import { PUBLIC_GOOGLE_API_KEY } from "$env/static/public";
-import type { Prisma } from "@prisma/client";
 import { goto } from "$app/navigation";
 import { z } from "zod";
-
-type User = Prisma.UserGetPayload<{
-    include: {
-        oauthConnections: true,
-        tokens: true
-    }
-}>;
+import { trpc } from "./trpc/client";
 
 type CreateNewUserRequest = {
     displayName: string,
@@ -52,7 +45,7 @@ const setupGoogleAuth = async (code: string, mode: string) => {
     const internalUserData = await checkUserExists(validatedUser.metadata.source.id )
 
     if (internalUserData) {
-        await generateUserToken(internalUserData.id);
+        await generateUserToken(internalUserData.user.id);
     } else {
         await createNewUser({
             displayName: validatedUser.displayName,
@@ -67,12 +60,7 @@ const setupGoogleAuth = async (code: string, mode: string) => {
 }
 
 const getTokenFromCode = async (code: string): Promise<OAuthTokenPayload> => {
-    const res = await axios.post<OAuthTokenPayload>(`/api/google/auth/token?code=${code}`);
-    if (res.status === 200) {
-        return res.data;
-    } else {
-        throw new Error("Didnt get 200 when fetching token with auth_code");
-    }
+    return await trpc().google.token.query(code);
 }
 
 const validateOAuthTokenPayload= (oauthPayload: OAuthTokenPayload): OAuthTokenPayload => {
@@ -118,30 +106,18 @@ const validateGoogleUserObject = (googlePersonObject: Google.Person): Pick<Googl
     }
 }
 
-const checkUserExists = async (providerId: string): Promise<User | null> => {
-    const internalUserRes = await axios.get<User>(`/api/user/hasprovider/google/${providerId}`, {
-        validateStatus: () => true
-    });
-
-    if (internalUserRes.status === 200) {
-        return internalUserRes.data;
-    } else {
-        return null;
-    }
+const checkUserExists = async (accountId: string) => {
+    return await trpc().user.getByOAuthProviderId.query({ accountId, provider: "GOOGLE" })
 }
 
 const createNewUser = async (newUser: CreateNewUserRequest) => {
-    const createUserRes = await axios.post<User>("/api/user", JSON.stringify(newUser), {
-        validateStatus: () => true
-    });
-    Cookies.set("user", createUserRes.data.tokens[0].token);
+    const createUserRes = await trpc().user.createNewUserWithOAuth.mutate(newUser);
+    Cookies.set("user", createUserRes.tokens[0].token);
 }
 
 const generateUserToken = async (userId: number) => {
-    const newTokenRes = await axios.get<string>(`/api/user/${userId}/newtoken`, {
-        validateStatus: () => true
-    });
-    Cookies.set("user", newTokenRes.data);
+    const newToken = await trpc().user.generateUserToken.mutate(userId);
+    Cookies.set("user", newToken);
 }
 
 export {

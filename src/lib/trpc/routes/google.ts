@@ -40,7 +40,7 @@ export const google = router({
             params.append("refresh_token", input);
             params.append("grant_type", "refresh_token");
 
-            const res = await axios.post("https://oauth2.googleapis.com/token", params, {
+            const res = await axios.post<OAuthTokenPayload>("https://oauth2.googleapis.com/token", params, {
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded"
                 }
