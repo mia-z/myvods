@@ -566,6 +566,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@trpc/client@npm:^10.37.1":
+  version: 10.37.1
+  resolution: "@trpc/client@npm:10.37.1"
+  peerDependencies:
+    "@trpc/server": 10.37.1
+  checksum: 82fefed08717f7bf59a9013387c69a990de1d35c142519e1e8f29472cb8d16b6ce4d530d20d336e4a371993d93663e4ff7a86d1652a500a97e0632324df2e899
+  languageName: node
+  linkType: hard
+
+"@trpc/server@npm:^10.37.1":
+  version: 10.37.1
+  resolution: "@trpc/server@npm:10.37.1"
+  checksum: 0945bc60e1966f57c5944451a9a24b9d565f50e125e71369882379e6580de4ed2e2575a78c474709876d5e2e849fe0e133658c045484a230158516f59f23d7d7
+  languageName: node
+  linkType: hard
+
 "@types/chai-subset@npm:^1.3.3":
   version: 1.3.3
   resolution: "@types/chai-subset@npm:1.3.3"
@@ -3106,6 +3122,8 @@ __metadata:
     "@sveltejs/kit": ^1.20.4
     "@sveltestack/svelte-query": ^1.6.0
     "@tailwindcss/typography": ^0.5.9
+    "@trpc/client": ^10.37.1
+    "@trpc/server": ^10.37.1
     "@types/luxon": ^3.3.1
     "@types/uuid": ^9.0.2
     "@typescript-eslint/eslint-plugin": ^5.45.0
@@ -3128,6 +3146,7 @@ __metadata:
     svelte-check: ^3.4.3
     svelte-fa: ^3.0.4
     tailwindcss: ^3.3.3
+    trpc-sveltekit: ^3.5.20
     tslib: ^2.4.1
     typescript: ^5.0.0
     uuid: ^9.0.0
@@ -4421,6 +4440,18 @@ __metadata:
   version: 1.4.1
   resolution: "triple-beam@npm:1.4.1"
   checksum: 2e881a3e8e076b6f2b85b9ec9dd4a900d3f5016e6d21183ed98e78f9abcc0149e7d54d79a3f432b23afde46b0885bdcdcbff789f39bc75de796316961ec07f61
+  languageName: node
+  linkType: hard
+
+"trpc-sveltekit@npm:^3.5.20":
+  version: 3.5.20
+  resolution: "trpc-sveltekit@npm:3.5.20"
+  peerDependencies:
+    "@sveltejs/adapter-node": ">=1.2"
+    "@trpc/client": ">=10"
+    "@trpc/server": ">=10"
+    ws: ">=8"
+  checksum: 242ade50c83aeec7a6980e94c102df4092c0f2d1b19645af1a2f3c678b03d2fb4f512ca29a3a17068a61b9b31a3ff8acdc5398af348497881aefb9a0330a072e
   languageName: node
   linkType: hard
 
