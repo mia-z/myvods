@@ -5,10 +5,8 @@
     import { GoogleAuth } from "$stores/GoogleAuth.store";
     import { TwitchAuth } from "$stores/TwitchAuth.store";
     import { GoogleOAuthUrl, TwitchOAuthUrl } from "$lib/AuthUrlHelper";
-    import LoginButton from "$components/LoginButton.svelte";
 	import { faGoogle, faTwitch } from "@fortawesome/free-brands-svg-icons";
 	import Fa from "svelte-fa";
-	import Modal from "$components/Modal.svelte";
 	import { trpc } from "$trpc/client";
 
     let unlinkModalOpen: boolean = false;
@@ -22,8 +20,19 @@
 
     const onUnlinkConfirm = async () => {
         unlinking = true;
-        const unlinkRes = trpc().user.removeOAuth.mutate({ provider: providerToUnlink, userId: $UserData.id as string});
+        switch(providerToUnlink) {
+            case "TWITCH": {
+                await trpc().user.removeOAuth.mutate({ provider: "TWITCH", userId: $UserData.id });
+                await TwitchAuth.revoke($TwitchAuth.token); break;
+            }
+            case "GOOGLE": {
+                await trpc().user.removeOAuth.mutate({ provider: "GOOGLE", userId: $UserData.id });
+                await GoogleAuth.revoke($GoogleAuth.token); break;
+            }
+            default: throw Error("");
+        }
         unlinking = false;
+        unlinkModalOpen = false;
     }
 </script>
 

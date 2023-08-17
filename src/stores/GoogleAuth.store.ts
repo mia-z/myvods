@@ -46,6 +46,16 @@ const createAuthStore = () => {
         setRefresh: (refresh: string) => update((s) => { return { ...s, refresh} }),
         setExpire: (expire: number) => update((s) => { return { ...s, expire} }),
         setUser: (user:  Google.Person) => update((s) => { return { ...s, user} }),
+        revoke: async (token: string) => {
+            const revokeRes = await axios.post(`https://oauth2.googleapis.com/revoke?token=${token}`, {
+                validateStatus: () => true
+            });
+            console.log("revoked google with res: " + revokeRes.status);
+            return update((state) => { return {
+                ...state,
+                user: null
+            }});
+        },
 		reset: () => set(initial)
 	};
 }

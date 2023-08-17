@@ -51,6 +51,16 @@ const createAuthStore = () => {
         setRefresh: (refresh: string) => update((s) => { return { ...s, refresh} }),
         setExpire: (expire: number) => update((s) => { return { ...s, expire} }),
         setUser: (user:  Twitch.User) => update((s) => { return { ...s, user} }),
+        revoke: async (token: string) => {
+            const revokeRes = await axios.post(`https://id.twitch.tv/oauth2/revoke?client_id=${PUBLIC_TWITCH_CLIENT_ID}&token=${token}`, null, {
+                validateStatus: () => true
+            });
+            console.log("revoked twitch with res: " + revokeRes.status);
+            return update((state) => { return {
+                ...state,
+                user: null
+            }});
+        },
 		reset: () => set(initial)
 	};
 }

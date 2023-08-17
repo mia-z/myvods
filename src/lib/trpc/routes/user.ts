@@ -190,7 +190,7 @@ export const user = router({
         }),
     removeOAuth: publicProcedure
         .input(z.object({
-            userId: z.string(),
+            userId: z.number(),
             provider: z.union([
                 z.literal("TWITCH"),
                 z.literal("GOOGLE")
@@ -199,7 +199,7 @@ export const user = router({
         .mutation(async ({ input }) => {
             const oauthToDelete = await prisma.user.findUnique({
                 where: {
-                    id: parseInt(input.userId),
+                    id: input.userId,
                 },
                 select: {
                     oauthConnections: {

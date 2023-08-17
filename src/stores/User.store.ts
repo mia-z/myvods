@@ -4,14 +4,14 @@ import type { Provider } from "../constants";
 
 type User = {
     displayName: string,
-    id: string | number ,
+    id: number ,
     oauthConnections: {
         [key in Provider]?: OAuthConnection
     }
 }
 
 type OAuthConnection = {
-    id: string | number ,
+    id: number ,
     accountId: string,
     authCode: string,
     refreshToken: string
