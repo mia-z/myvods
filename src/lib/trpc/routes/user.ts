@@ -141,5 +141,86 @@ export const user = router({
                     }
                 }
             });
-        })
+        }),
+    linkNewOAuth: publicProcedure
+        .input(z.object({
+            userId: z.number(),
+            accountId: z.string().nonempty(),
+            provider: z.union([
+                z.literal("TWITCH"),
+                z.literal("GOOGLE")
+            ]),
+            authCode: z.string().nonempty(),
+            refreshToken: z.string().nonempty()
+        }))
+        .mutation(async ({ input }) => {
+            const newOauthRes = await prisma.user.update({
+                where: {
+                    id: input.userId
+                },
+                data: {
+                    tokens: {
+                        create: {
+                            expires: DateTime.now().plus({ days: 7 }).toString(),
+                            token: uuid(),
+                        }
+                    },
+                    oauthConnections: {
+                        create: {
+                            accountId: input.accountId,
+                            authCode: input.authCode,
+                            provider: input.provider,
+                            refreshToken: input.refreshToken,
+                        }
+                    }
+                },
+                select: {
+                    displayName: true,
+                    id: true,
+                    oauthConnections: true,
+                    tokens: {
+                        orderBy: {
+                            id: "desc"
+                        },
+                        take: 1
+                    }
+                }
+            });
+            return newOauthRes.tokens[0].token;
+        }),
+    removeOAuth: publicProcedure
+        .input(z.object({
+            userId: z.string(),
+            provider: z.union([
+                z.literal("TWITCH"),
+                z.literal("GOOGLE")
+            ]),
+        }))
+        .mutation(async ({ input }) => {
+            const oauthToDelete = await prisma.user.findUnique({
+                where: {
+                    id: parseInt(input.userId),
+                },
+                select: {
+                    oauthConnections: {
+                        where: {
+                            provider: input.provider
+                        }
+                    }
+                }
+            });
+            if (oauthToDelete && oauthToDelete.oauthConnections[0]) {
+                await prisma.oAuthConnection.delete({
+                    where: {
+                        id: oauthToDelete.oauthConnections[0].id
+                    }
+                });
+            } else {
+                throw new TRPCError({
+                    code: "BAD_REQUEST",
+                    message: `Couldnt find user associated with id: ${input.userId}`,
+                    cause: "Prisma/Server"
+                });
+            }
+        }),
 });

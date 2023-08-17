@@ -1,19 +1,22 @@
 import { z } from "zod";
 import axios from "$lib/server/AxiosClient";
 import { SECRET_GOOGLE_CLIENT_SECRET } from "$env/static/private";
-import { PUBLIC_GOOGLE_CLIENT_ID, PUBLIC_GOOGLE_AUTH_CALLBACK_URI_NEW } from "$env/static/public";
+import { PUBLIC_GOOGLE_CLIENT_ID, PUBLIC_GOOGLE_AUTH_CALLBACK_URI_NEW, PUBLIC_GOOGLE_AUTH_CALLBACK_URI_LINK } from "$env/static/public";
 import { router, publicProcedure } from "../t";
 import { TRPCError } from "@trpc/server";
 
 export const google = router({
     token: publicProcedure
-        .input(z.string())
+        .input(z.object({
+            code: z.string(),
+            mode: z.string()
+        }))
         .query(async ({ input }) => {
             const params = new URLSearchParams();
-            params.append("code", input);
+            params.append("code", input.code);
             params.append("client_id", PUBLIC_GOOGLE_CLIENT_ID);
             params.append("client_secret", SECRET_GOOGLE_CLIENT_SECRET);
-            params.append("redirect_uri", PUBLIC_GOOGLE_AUTH_CALLBACK_URI_NEW);
+            params.append("redirect_uri", input.mode === "link" ? PUBLIC_GOOGLE_AUTH_CALLBACK_URI_LINK : PUBLIC_GOOGLE_AUTH_CALLBACK_URI_NEW);
             params.append("grant_type", "authorization_code");
 
             const res = await axios.post<OAuthTokenPayload>("https://oauth2.googleapis.com/token", params, {

@@ -11,6 +11,9 @@ const GoogleOAuthUrl = (link = false): URL => {
     url.searchParams.append("access_type", "offline");
     url.searchParams.append("include_granted_scopes", "true");
     url.searchParams.append("response_type", "code");
+    if (link) {
+        url.searchParams.append("prompt", "consent");
+    }
     url.searchParams.append("redirect_uri", link ? PUBLIC_GOOGLE_AUTH_CALLBACK_URI_LINK : PUBLIC_GOOGLE_AUTH_CALLBACK_URI_NEW );
     url.searchParams.append("client_id", PUBLIC_GOOGLE_CLIENT_ID);
     return url;

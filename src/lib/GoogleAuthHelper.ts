@@ -13,6 +13,14 @@ type CreateNewUserRequest = {
     refreshToken: string
 }
 
+type LinkOAuthRequest = {
+    userId: number,
+    accountId: string,
+    provider: "GOOGLE" | "TWITCH",
+    authCode: string,
+    refreshToken: string
+}
+
 const OAuthPayloadSchema = z.object({
     access_token: z.string().nonempty(),
     expires_in: z.number().nonnegative(),
@@ -34,7 +42,7 @@ const GoogleUserResponseSchema = z.object({
 });
 
 const setupGoogleAuth = async (code: string, mode: string) => {
-    const tokenRes = await getTokenFromCode(code);
+    const tokenRes = await getTokenFromCode(code, mode);
 
     const validatedToken = validateOAuthTokenPayload(tokenRes);
 
@@ -42,9 +50,24 @@ const setupGoogleAuth = async (code: string, mode: string) => {
 
     const validatedUser = validateGoogleUserObject(googleUserRes);
 
-    const internalUserData = await checkUserExists(validatedUser.metadata.source.id )
+    const internalUserData = await checkUserExists(validatedUser.metadata.source.id)
 
-    if (internalUserData) {
+    if (mode === "link") {
+        const token = Cookies.get("user");
+        if (!token) {
+            throw Error("Tried linking an account, but token doesnt exist!");
+        }
+
+        const userFromToken = await trpc().user.getByUUIDToken.query(token);
+
+        await linkNewOAuth({
+            userId: userFromToken.id,
+            accountId: validatedUser.metadata.source.id,
+            provider: "GOOGLE",
+            authCode: code,
+            refreshToken: tokenRes.refresh_token as string
+        });
+    } else if (internalUserData) {
         await generateUserToken(internalUserData.user.id);
     } else {
         await createNewUser({
@@ -59,8 +82,8 @@ const setupGoogleAuth = async (code: string, mode: string) => {
     return goto(mode === "link" ? "/app/profile" : "/app");
 }
 
-const getTokenFromCode = async (code: string): Promise<OAuthTokenPayload> => {
-    return await trpc().google.token.query(code);
+const getTokenFromCode = async (code: string, mode: string): Promise<OAuthTokenPayload> => {
+    return await trpc().google.token.query({ code, mode });
 }
 
 const validateOAuthTokenPayload= (oauthPayload: OAuthTokenPayload): OAuthTokenPayload => {
@@ -82,6 +105,7 @@ const getGoogleUserData = async (accessToken: string): Promise<Google.Person> =>
         }
     });
     if (res.status === 200) {
+        Cookies.set("gid", res.data.names[0].metadata.source.id);
         return res.data;
     } else {
         throw new Error("Couldnt get Google user data with the new token from Google!" + res.data.toString());    
@@ -118,6 +142,11 @@ const createNewUser = async (newUser: CreateNewUserRequest) => {
 const generateUserToken = async (userId: number) => {
     const newToken = await trpc().user.generateUserToken.mutate(userId);
     Cookies.set("user", newToken);
+}
+
+const linkNewOAuth = async (newOAuth: LinkOAuthRequest) => {
+    const linkNewOAuthRes = await trpc().user.linkNewOAuth.mutate(newOAuth);
+    Cookies.set("user", linkNewOAuthRes)
 }
 
 export {

@@ -1,3 +1,13 @@
+declare namespace Twitch {
+    interface User {
+        id: string;
+        login: string;
+        display_name: string;
+        profile_image_url: string;
+        offline_image_url: string;
+    }
+}
+
 declare namespace Google {
     interface Person {
         resourceName: string;
