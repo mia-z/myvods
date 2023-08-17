@@ -4443,8 +4443,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-<<<<<<< HEAD
-=======
 "trpc-sveltekit@npm:^3.5.20":
   version: 3.5.20
   resolution: "trpc-sveltekit@npm:3.5.20"
@@ -4457,7 +4455,6 @@ __metadata:
   languageName: node
   linkType: hard
 
->>>>>>> fe1efef475ac57b474c558522572c4caf183ab4a
 "ts-interface-checker@npm:^0.1.9":
   version: 0.1.13
   resolution: "ts-interface-checker@npm:0.1.13"

@@ -10,7 +10,7 @@ client.interceptors.response.use(
         logger.info({ source: "Axios/Response", text: `Got ${res.status} response from: ${res.config.url}` });
         if (res.status >= 400) {
             console.log(res)
-            logger.error({ source: "Axios/Response", text: `Error response ${res.status} with message: ${res.data.error}` });
+            logger.error({ source: "Axios/Response", text: `Error response ${res.status} with message: ${res.data.error ?? res.data.message}` });
         }
         return res;
     },
