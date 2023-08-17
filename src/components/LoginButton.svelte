@@ -7,11 +7,13 @@
     export let provider: "Twitch" | "Google"
 </script>
 
-<a {href} class={`btn btn-neutral w-60 rounded-full shadow-lg mx-auto flex flex-row`}>
+<svelte:element this={"a"} {href} class={`btn btn-neutral w-60 rounded-full shadow-lg mx-auto flex flex-row ${$$props.class}`}>
     <div class={"text-xl"}>
         <Fa class={"my-auto"} {icon} />
     </div>
     <div class={"my-auto"}>
-        Log in with {provider}
+        <slot name="text">
+            Log in with {provider}
+        </slot>
     </div>
-</a>
+</svelte:element>

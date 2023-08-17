@@ -1,32 +1,38 @@
-import axios from "axios";
 import { writable } from "svelte/store";
-import * as Cookies from "es-cookie";
-import type { Prisma } from "@prisma/client";
+import { trpc } from "$trpc/client";
+import type { Provider } from "../constants";
 
-type UserFromUuid = Prisma.UserGetPayload<{
-    include: {
-        oauthConnections: true
+type User = {
+    displayName: string,
+    id: string | number ,
+    oauthConnections: {
+        [key in Provider]?: OAuthConnection
     }
-}>;
+}
 
-type UserState = UserFromUuid;
+type OAuthConnection = {
+    id: string | number ,
+    accountId: string,
+    authCode: string,
+    refreshToken: string
+}
 
 const createStore = () => {
-	const { subscribe, set } = writable<UserState>();
+	const { subscribe, set } = writable<User>();
 
 	return {
 		subscribe,
-        init: async () => {
-            const uuidToken = Cookies.get("user");
-            const userFromUuidToken = await axios.get<UserFromUuid>(`/api/loginToken/${uuidToken}/user`, {
-                validateStatus: () => true
-            });
-            
-            if (userFromUuidToken.status !== 200) {
-                throw new Error("Didnt get 200 when getting user from uuid");
+        init: async (uuidCookie: string) => {
+            const userFromUuidToken = await trpc().user.getByUUIDToken.query(uuidCookie);
+            const mappedConnections: User = {
+                displayName: userFromUuidToken.displayName,
+                id: userFromUuidToken.id,
+                oauthConnections: {
+                    Twitch: userFromUuidToken.oauthConnections.find(x => x.provider === "TWITCH"),
+                    Google: userFromUuidToken.oauthConnections.find(x => x.provider === "GOOGLE")
+                }
             }
-            console.log(userFromUuidToken.data)
-            set(userFromUuidToken.data);
+            set(mappedConnections);
         }
 	};
 }

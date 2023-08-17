@@ -4,7 +4,6 @@
     import { onMount } from "svelte";
     import * as Cookies from "es-cookie";
 	import { goto } from "$app/navigation";
-    import axios from "axios";
 	import { UserData } from "$stores/User.store";
     import { faRightFromBracket, faUserGear } from "@fortawesome/free-solid-svg-icons";
     import Fa from "svelte-fa";
@@ -15,22 +14,20 @@
             console.log("No uuid cookie, cya");
             goto("/");
         } else {
-            await UserData.init();
+            await UserData.init(uuidCookie);
         }
     });
 
     $: {
         if ($UserData) {
-            const twitchOAuthData = $UserData.oauthConnections.find(x => x.provider === "TWITCH");
-            if (twitchOAuthData) {
-                TwitchAuth.init(twitchOAuthData.refreshToken).then(() => {
+            if ($UserData.oauthConnections.Twitch) {
+                TwitchAuth.init($UserData.oauthConnections.Twitch.refreshToken).then(() => {
                     console.log("Registered Twitch OAuth data");
                 });
             }
 
-            const googleOAuthData = $UserData.oauthConnections.find(x => x.provider === "GOOGLE");
-            if (googleOAuthData) {
-                GoogleAuth.init(googleOAuthData.refreshToken).then(() => {
+            if ($UserData.oauthConnections.Google) {
+                GoogleAuth.init($UserData.oauthConnections.Google.refreshToken).then(() => {
                     console.log("Registered Google OAuth data");
                 });
             }
