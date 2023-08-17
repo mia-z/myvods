@@ -14,6 +14,9 @@ export default {
         "roboto": ["Roboto Flex", "sans-serif"],
         "roboto-monospace": ["Roboto Mono", "monospace"],
         "wix-madefor-text": ["Wix Madefor Text", "sans-serif"],
+      },
+      colors: {
+        "twitch-purple": "rgb(145 70 255)"
       }
     },
   },

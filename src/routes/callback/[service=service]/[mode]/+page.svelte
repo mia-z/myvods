@@ -58,7 +58,7 @@
             </div>
         {:else}
             <div class={"mx-auto text-xl"}>
-                Setting up auth for&nbsp;<span class={"font-bold capitalize"}>{service}</span>
+                {mode === "link" ? "Setting up auth for:" : "Logging in with:"}&nbsp;<span class={"font-bold capitalize"}>{service}</span>
             </div>
             <Fa icon={faSpinner} class={"text-2xl animate-spin"} />
         {/if}

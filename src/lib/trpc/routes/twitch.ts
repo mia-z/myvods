@@ -1,22 +1,25 @@
 import { z } from "zod";
 import { SECRET_TWITCH_CLIENT_SECRET } from "$env/static/private";
-import { PUBLIC_TWITCH_AUTH_CALLBACK_URI_NEW, PUBLIC_TWITCH_CLIENT_ID } from "$env/static/public";
+import { PUBLIC_TWITCH_AUTH_CALLBACK_URI_LINK, PUBLIC_TWITCH_AUTH_CALLBACK_URI_NEW, PUBLIC_TWITCH_CLIENT_ID } from "$env/static/public";
 import axios from "$lib/server/AxiosClient";
 import { router, publicProcedure } from "../t";
 import { TRPCError } from "@trpc/server";
 
 export const twitch = router({
     token: publicProcedure
-        .input(z.string())
+        .input(z.object({
+            code: z.string(),
+            mode: z.string()
+        }))        
         .query(async ({ input }) => {
             const params = new URLSearchParams();
-            params.append("code", input);
+            params.append("code", input.code);
             params.append("client_id", PUBLIC_TWITCH_CLIENT_ID);
             params.append("client_secret", SECRET_TWITCH_CLIENT_SECRET);
-            params.append("redirect_uri", PUBLIC_TWITCH_AUTH_CALLBACK_URI_NEW);
+            params.append("redirect_uri", input.mode === "link" ? PUBLIC_TWITCH_AUTH_CALLBACK_URI_LINK : PUBLIC_TWITCH_AUTH_CALLBACK_URI_NEW);
             params.append("grant_type", "authorization_code");
 
-            const res = await axios.post<TwitchTokenRes>("https://id.twitch.tv/oauth2/token", params, {
+            const res = await axios.post<OAuthTokenPayload>("https://id.twitch.tv/oauth2/token", params, {
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded"
                 },

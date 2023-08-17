@@ -1,12 +1,21 @@
 import { writable } from "svelte/store";
 import { trpc } from "$trpc/client";
-import type { Prisma } from "@prisma/client";
+import type { Provider } from "../constants";
 
-type User = Prisma.UserGetPayload<{
-    include: {
-        oauthConnections: true,
+type User = {
+    displayName: string,
+    id: string | number ,
+    oauthConnections: {
+        [key in Provider]?: OAuthConnection
     }
-}>;
+}
+
+type OAuthConnection = {
+    id: string | number ,
+    accountId: string,
+    authCode: string,
+    refreshToken: string
+}
 
 const createStore = () => {
 	const { subscribe, set } = writable<User>();
@@ -15,8 +24,15 @@ const createStore = () => {
 		subscribe,
         init: async (uuidCookie: string) => {
             const userFromUuidToken = await trpc().user.getByUUIDToken.query(uuidCookie);
-            console.log(userFromUuidToken)
-            set(userFromUuidToken);
+            const mappedConnections: User = {
+                displayName: userFromUuidToken.displayName,
+                id: userFromUuidToken.id,
+                oauthConnections: {
+                    Twitch: userFromUuidToken.oauthConnections.find(x => x.provider === "TWITCH"),
+                    Google: userFromUuidToken.oauthConnections.find(x => x.provider === "GOOGLE")
+                }
+            }
+            set(mappedConnections);
         }
 	};
 }

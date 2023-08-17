@@ -6,14 +6,6 @@ type OAuthTokenPayload = {
     refresh_token?: string
 }
 
-type TwitchTokenRes = {
-    access_token: string,
-    expires_in: number,
-    token_type: "bearer",
-    scope?: string[],
-    refresh_token: string
-}
-
 type TwitchTokenUser = {
     client_id: string,
     login: string,
