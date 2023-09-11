@@ -2,7 +2,6 @@
 	import { onMount } from "svelte";
     import { page } from "$app/stores";
     import Fa from "svelte-fa";
-    import { faGoogle, faTwitch } from "@fortawesome/free-brands-svg-icons";
     import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 	import { setupGoogleAuth } from "$lib/GoogleAuthHelper";
 	import { setupTwitchAuth } from "$lib/TwitchAuthHelper";
@@ -31,7 +30,7 @@
                 console.log(e);
                 console.log(e.response?.data);
                 loginError = e.response?.data?.message
-            } if (e instanceof TRPCClientError) {
+            } else if (e instanceof TRPCClientError) {
                 console.log(e)
                 loginError = e.message
             } else {
@@ -39,7 +38,6 @@
             }
         }
     });
-
 </script>
 
 <div class="min-h-screen w-full flex flex-col">

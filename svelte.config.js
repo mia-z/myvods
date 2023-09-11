@@ -10,6 +10,7 @@ const config = {
         alias: {
             "$styles": "./src/styles/*",
             "$components": "./src/components/*",
+            "$sections": "./src/sections/*",
             "$stores": "./src/stores/*",
             "$trpcroutes": "./src/lib/trpc/routes/*",
             "$trpc": "./src/lib/trpc/*",

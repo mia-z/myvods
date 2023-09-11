@@ -24,16 +24,12 @@ const createAuthStore = () => {
 		subscribe,
         init: async (refreshToken: string) => {
             const refreshRes = await trpc().google.refresh.query(refreshToken);
-            console.log("google refresh res");
-            console.log(refreshRes);
             const res = await axios.get<Google.Person>(`https://people.googleapis.com/v1/people/me?personFields=names&key=${PUBLIC_GOOGLE_API_KEY}`, {
                 headers: {
                     "Authorization": `Bearer ${refreshRes.access_token}`,
                     "Accept": "application/json"
                 }
             });
-            console.log("google user res");
-            console.log(res.data)
             return update((state) => { return {
                 ...state,
                 token: refreshRes.access_token,

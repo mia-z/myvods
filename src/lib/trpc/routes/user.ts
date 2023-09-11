@@ -24,7 +24,8 @@ export const user = router({
         .query(async ({ input }) => {
             return await prisma.user.findFirstOrThrow({
                 include: {
-                    oauthConnections: true
+                    oauthConnections: true,
+                    vods: true
                 },
                 where: {
                     tokens: {
@@ -223,4 +224,50 @@ export const user = router({
                 });
             }
         }),
+    changeName: publicProcedure
+        .input(z.string()
+            .nonempty("Must enter a value")
+            .max(20, "Name must be shorted than 20 characters")
+            .min(3, "Name must be longer than 2 characters")
+            .regex(/^([a-zA-Z0-9])+$/, "Must only use letters and numbers")
+            .trim())
+        .mutation(async ({ input, ctx }) => {
+            if (!ctx.userCookie) {
+                throw new TRPCError({
+                    code: "BAD_REQUEST",
+                    message: `MISSING USER TOKEN`,
+                    cause: "Prisma/Server"
+                });
+            }
+
+            const user = await prisma.user.findFirst({
+                include: {
+                    oauthConnections: true
+                },
+                where: {
+                    tokens: {
+                        some: {
+                            token: ctx.userCookie
+                        }
+                    }
+                }
+            });
+
+            if (!user) {
+                throw new TRPCError({
+                    code: "FORBIDDEN",
+                    message: `INVALID USER TOKEN`,
+                    cause: "Prisma/Server"
+                });
+            }
+
+            await prisma.user.update({
+                where: {
+                    id: user.id
+                }, 
+                data: {
+                    displayName: input
+                }
+            });
+        })
 });

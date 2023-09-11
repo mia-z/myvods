@@ -13,3 +13,15 @@ type TwitchTokenUser = {
     user_id: string,
     expires_in: number
 }
+
+type TrpcValidationError = {
+    code: string,
+    minimum?: number,
+    maximum?: number,
+    type: string,
+    inclusive?: boolean,
+    exact?: boolean,
+    message: string,
+    path: string[],
+    validation?: string
+}

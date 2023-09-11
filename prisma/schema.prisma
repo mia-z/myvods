@@ -14,6 +14,7 @@ model User {
     displayName         String
     oauthConnections    OAuthConnection[]
     tokens              LoginToken[]
+    vods                Vod[]
 }
 
 model LoginToken {
@@ -38,6 +39,23 @@ model Vod {
     id              Int @id @default(autoincrement())
     provider        Provider
     link            String
+    userId          Int
+    user            User @relation(fields: [userId], references: [id])
+    images          Image[]
+}
+
+model Image {
+    id              Int @id @default(autoincrement())
+    link            String
+    type            ImageType
+    vodId           Int
+    vod             Vod @relation(fields: [vodId], references: [id])
+}
+
+enum ImageType {
+    THUMBNAIL
+    COVER
+    DEFAULT
 }
 
 enum Provider {

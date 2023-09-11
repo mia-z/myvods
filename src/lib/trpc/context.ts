@@ -2,8 +2,9 @@ import type { RequestEvent } from "@sveltejs/kit";
 import type { inferAsyncReturnType } from "@trpc/server";
 
 export const createContext = async (event: RequestEvent) => {
-    return {
 
+    return {
+        userCookie: event.cookies.get("user")
     }
 }
 

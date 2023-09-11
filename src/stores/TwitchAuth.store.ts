@@ -25,8 +25,6 @@ const createAuthStore = () => {
 		subscribe,
         init: async (refresh: string) => {
             const refreshRes = await trpc().twitch.refresh.query(refresh);
-            console.log("twitch refresh res");
-            console.log(refreshRes);
             const twitchId = Cookies.get("tid");
             if (!twitchId) {
                 throw Error("There isnt a twitch id save in cookie, this shouldnt happen");
@@ -37,8 +35,6 @@ const createAuthStore = () => {
                     "Client-ID": PUBLIC_TWITCH_CLIENT_ID
                 },
             });
-            console.log("twitch user res");
-            console.log(res.data);
             return update((state) => { return {
                 ...state,
                 token: refreshRes.access_token,
