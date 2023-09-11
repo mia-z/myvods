@@ -79,7 +79,7 @@ const setupGoogleAuth = async (code: string, mode: string) => {
         });
     }
 
-    return goto(mode === "link" ? "/app/profile" : "/app");
+    return goto(mode === "link" ? "/creators/profile" : "/creators");
 }
 
 const getTokenFromCode = async (code: string, mode: string): Promise<OAuthTokenPayload> => {

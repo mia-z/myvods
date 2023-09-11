@@ -5,7 +5,6 @@ import { trpc } from "$trpc/client";
 export const load: LayoutServerLoad = async (event) => {
     const userCookie = event.cookies.get("user");
     if (userCookie) {
-        //const userFromUuidToken = await router.createCaller(await createContext(event)).user.getByUUIDToken(userCookie);
         const userFromUuidToken = await trpc(event).user.getByUUIDToken.query(userCookie);
         const mappedConnections: User = {
             displayName: userFromUuidToken.displayName,
