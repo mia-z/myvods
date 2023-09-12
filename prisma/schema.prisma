@@ -32,24 +32,47 @@ model OAuthConnection {
     refreshToken    String
     userId          Int
     user            User @relation(fields: [userId], references: [id])
-    provider        Provider
+    provider        OAuthProvider
 }
 
 model Vod {
     id              Int @id @default(autoincrement())
-    provider        Provider
+    provider        VideoService
     link            String
     userId          Int
     user            User @relation(fields: [userId], references: [id])
-    images          Image[]
 }
 
 model Image {
     id              Int @id @default(autoincrement())
     link            String
     type            ImageType
-    vodId           Int
-    vod             Vod @relation(fields: [vodId], references: [id])
+    resourceId      Int
+}
+
+model CommunityCreator {
+    id              Int @id @default(autoincrement())
+    name            String
+    slug            String @unique
+    vods            CommunityVod[]
+}
+
+model CommunityVod {
+    id                  Int @id @default(autoincrement())
+    service             VideoService
+    videoTitle          String
+    videoId             String
+    communityCreatorId  Int
+    communityCreator    CommunityCreator @relation(fields: [communityCreatorId], references: [id])
+    annotations         CommunityVodAnnotation[]
+}
+
+model CommunityVodAnnotation {
+    id              Int @id @default(autoincrement())
+    note            String?
+    timestamp       DateTime
+    communityVodId  Int
+    communityVod    CommunityVod @relation(fields: [communityVodId], references: [id])
 }
 
 enum ImageType {
@@ -58,7 +81,14 @@ enum ImageType {
     DEFAULT
 }
 
-enum Provider {
+enum VideoService {
+    Youtube
+    Twitch
+    Kick
+    Rumble
+}
+
+enum OAuthProvider {
     GOOGLE
     TWITCH
 }

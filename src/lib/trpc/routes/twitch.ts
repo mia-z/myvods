@@ -56,7 +56,7 @@ export const twitch = router({
                 throw new TRPCError({
                     code: "INTERNAL_SERVER_ERROR",
                     message: "Didnt get 200 when refreshing Twitch token!",
-                    cause: "Axios/Server"
+                    cause: "Server/Axios"
                 });
             }
         }),
@@ -77,7 +77,7 @@ export const twitch = router({
                 throw new TRPCError({
                     code: "INTERNAL_SERVER_ERROR",
                     message: "Didnt get OK when trying to revoke Twitch token",
-                    cause: "Axios/Server"
+                    cause: "Server/Axios"
                 });
             }
         })

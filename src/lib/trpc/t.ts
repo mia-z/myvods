@@ -2,6 +2,7 @@ import type { Context } from "$lib/trpc/context";
 import { initTRPC } from "@trpc/server";
 import l from "$lib/server/Logger";
 import { v4 as uuid } from "uuid";
+import type { Router } from "./router";
 export const t = initTRPC.context<Context>().create();
 
 export const router = t.router;
