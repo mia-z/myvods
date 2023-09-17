@@ -12,13 +12,13 @@ const createStore = () => {
         init: (user: User) => {
             set(user);
         },
-        removeOAuth: (provider: $Enums.Provider) => {
+        removeOAuth: (provider: $Enums.OAuthProvider) => {
             return update((s) => {
                 return {
                     ...s,
                     oauthConnections: {
                         ...s.oauthConnections,
-                        [provider]: null
+                        [provider]: undefined
                     }
                 }
             });

@@ -23,12 +23,12 @@
             case "TWITCH": {
                 await trpc().user.removeOAuth.mutate({ provider: "TWITCH", userId: $UserData.id });
                 await TwitchAuth.revoke($TwitchAuth.token);
-                UserData.removeOAuth("Twitch");
+                UserData.removeOAuth("TWITCH");
             } break;
             case "GOOGLE": {
                 await trpc().user.removeOAuth.mutate({ provider: "GOOGLE", userId: $UserData.id });
                 await GoogleAuth.revoke($GoogleAuth.token);
-                UserData.removeOAuth("Google");
+                UserData.removeOAuth("GOOGLE");
             } break;
             default: throw Error("Provider to unlink isnt valid");
         }
