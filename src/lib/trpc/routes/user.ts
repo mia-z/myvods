@@ -96,7 +96,7 @@ export const user = router({
                 throw new TRPCError({
                     code: "BAD_REQUEST",
                     message: `Couldnt find user associated with uuid: ${input}`,
-                    cause: "Prisma/Server"
+                    cause: "Server/Prisma"
                 });
             }
         }),
@@ -220,7 +220,7 @@ export const user = router({
                 throw new TRPCError({
                     code: "BAD_REQUEST",
                     message: `Couldnt find user associated with id: ${input.userId}`,
-                    cause: "Prisma/Server"
+                    cause: "Server/Prisma"
                 });
             }
         }),
@@ -236,7 +236,7 @@ export const user = router({
                 throw new TRPCError({
                     code: "BAD_REQUEST",
                     message: `MISSING USER TOKEN`,
-                    cause: "Prisma/Server"
+                    cause: "Server/Prisma"
                 });
             }
 
@@ -257,7 +257,7 @@ export const user = router({
                 throw new TRPCError({
                     code: "FORBIDDEN",
                     message: `INVALID USER TOKEN`,
-                    cause: "Prisma/Server"
+                    cause: "Server/Prisma"
                 });
             }
 

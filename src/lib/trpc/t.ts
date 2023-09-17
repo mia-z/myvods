@@ -1,7 +1,11 @@
 import type { Context } from "$lib/trpc/context";
-import { initTRPC } from "@trpc/server";
+import { TRPCError, initTRPC } from "@trpc/server";
 import l from "$lib/server/Logger";
 import { v4 as uuid } from "uuid";
+import JWT from "jsonwebtoken";
+import { SECRET_JWT_SECRET } from "$env/static/private";
+import prisma from "$lib/server/Prisma";
+
 export const t = initTRPC.context<Context>().create();
 
 export const router = t.router;
@@ -22,6 +26,38 @@ const logger = t.middleware(async ({ path, type, next }) => {
     return res;
 });
 
-export const publicProcedure = procedure.use(logger);
+const authorizeContributor = t.middleware(async ({ ctx, next }) => {
+    if (!ctx.contributorCookie) {
+        throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: `NO TOKEN`,
+            cause: "tRPC/Server/middleware/authorizeContributor"
+        });
+    }
+
+    const verifiedToken = await JWT.verify(ctx.contributorCookie, SECRET_JWT_SECRET) as string;
+    
+    const validId = await prisma.contributorToken.findFirst({
+        where: {
+            token: verifiedToken
+        }
+    });
+
+    if (validId) {
+        return await next();
+    } else {
+        throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: `INVALID TOKEN`,
+            cause: "tRPC/Server/middleware/authorizeContributor"
+        });
+    }
+});
+
+export const loggedProcedure = procedure.use(logger);
+
+export const publicProcedure = loggedProcedure;
+
+export const contributorProcedure = loggedProcedure.use(authorizeContributor);
 
 export type Procedure = typeof t.procedure;

@@ -30,7 +30,7 @@ export const google = router({
                 throw new TRPCError({
                     code: "INTERNAL_SERVER_ERROR",
                     message: "Didnt get 200 from Google when getting new token with auth_code",
-                    cause: "Axios/Server"
+                    cause: "Server/Axios"
                 });
             }
         }),
@@ -56,7 +56,7 @@ export const google = router({
                 throw new TRPCError({
                     code: "INTERNAL_SERVER_ERROR",
                     message: "Didnt get 200 when refreshing Google token!",
-                    cause: "Axios/Server"
+                    cause: "Server/Axios"
                 });
             }
         }),
@@ -76,7 +76,7 @@ export const google = router({
                 throw new TRPCError({
                     code: "INTERNAL_SERVER_ERROR",
                     message: "Didnt get OK when trying to revoke Google token",
-                    cause: "Axios/Server"
+                    cause: "Server/Axios"
                 });
             }
         })

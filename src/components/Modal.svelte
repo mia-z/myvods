@@ -21,7 +21,7 @@
 </script>
 
 {#if open}
-    <div role={"dialog"} transition:fade on:click={() => onDismiss()} on:keyup={onKeyUp} class={`absolute top-0 left-0 h-[100vh] w-[100vw] backdrop-blur-sm`}>
+    <div role={"dialog"} transition:fade on:click={() => onDismiss()} on:keyup={onKeyUp} class={`absolute top-0 left-0 h-[100vh] w-[100vw] backdrop-blur-sm z-20 overflow-y-auto`}>
         <div class={"py-5 h-full flex"}>
             <div role={"backdrop"} on:click|stopPropagation on:keydown|stopPropagation transition:fly={{ y: 50 }} class={`m-auto bg-neutral rounded-md shadow-xl container xl:w-1/2 relative ${open && !canDismiss ? "border-accent border-2 cursor-wait" : ""} `}>
                 {#if open && !canDismiss}
@@ -49,7 +49,7 @@
                     </div>
                     <div class={"my-1 px-3 divider"}>
                     </div>
-                    <div class={"min-h-6 text-neutral-content p-3"}>
+                    <div class={"min-h-6 text-neutral-content p-3 "}>
                         <slot name="content" />
                     </div>
                 </div>
