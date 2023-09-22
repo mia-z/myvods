@@ -16,9 +16,9 @@
             <div class={"card-body flex flex-col"}>
                 <div class={"text-lg font-bold text-white group-hover:underline line-clamp-2"}>{vod.videoTitle}</div>
                 <div class={"flex flex-col mt-auto"}>
-                    <div class={"text-xs italic text-right"}>
+                    <!-- <div class={"text-xs italic text-right"}>
                         Duration: {Duration.fromISO(vod.duration).toFormat("h:m:s")}
-                    </div>
+                    </div> -->
                     <div class={"text-xs italic text-right"}>
                         Date Streamed: {DateTime.fromISO(vod.dateRecorded).toFormat("yyyy-LLL-dd")}
                     </div>
