@@ -43,15 +43,23 @@ const editCreatorSchema = z.object({
 }, "Name already exists");
 
 export const load: PageServerLoad = async (event: PageServerLoadEvent) => {
-    const newCreatorForm = await superValidate(newCreatorSchema);
-    const editCreatorForm = await superValidate(editCreatorSchema);
-
     const communityCreators = await trpc(event).community.getCommunityCreators.query();
-    return {
-        communityCreators,
-        newCreatorForm,
-        editCreatorForm
+
+    if (event.locals.communityContributorNick) {
+        const newCreatorForm = await superValidate(newCreatorSchema);
+        const editCreatorForm = await superValidate(editCreatorSchema);
+
+        return {
+            communityCreators,
+            newCreatorForm,
+            editCreatorForm
+        }
+    } else {
+        return {
+            communityCreators
+        }
     }
+
 }
 
 export const actions = {

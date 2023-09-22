@@ -30,15 +30,23 @@ export const load: PageServerLoad = async (event: PageServerLoadEvent) => {
     const communityVodWithAnnotations = await trpc(event).community.getCommunityVodBySlugWithAnnotations.query(event.params.communityVodSlug);
     
     if (communityVodWithAnnotations) {
+        if (event.locals.communityContributorNick) {
+            const newAnnotationForm = await superValidate(newAnnotationSchema);
+            const editAnnotationForm = await superValidate(editAnnotationSchema);
 
-        const newAnnotationForm = await superValidate(newAnnotationSchema);
-        const editAnnotationForm = await superValidate(editAnnotationSchema);
-        return {
-            editAnnotationForm,
-            newAnnotationForm,
-            communityContributorNick: event.locals.communityContributorNick,
-            communityContributorId: event.locals.communityContributorId,
-            communityVodWithAnnotations
+            return {
+                editAnnotationForm,
+                newAnnotationForm,
+                communityContributorNick: event.locals.communityContributorNick,
+                communityContributorId: event.locals.communityContributorId,
+                communityVodWithAnnotations
+            }
+        } else {
+            return {
+                communityContributorNick: event.locals.communityContributorNick,
+                communityContributorId: event.locals.communityContributorId,
+                communityVodWithAnnotations
+            }
         }
     } else {
         throw error(404, "Community Creator Vod Not found")
