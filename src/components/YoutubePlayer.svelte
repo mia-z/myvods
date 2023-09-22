@@ -9,8 +9,10 @@
     export let duration: number;
     export let currentTime: number;
     export let videoId: string;
+
     export const seek = async (seek: number) => {
-        await $player.seekTo(seek, false);
+        await $player.playVideo();
+        await $player.seekTo(seek, true);
     }
     
     let playerState: YT.PlayerState = 0;
