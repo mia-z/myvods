@@ -6,13 +6,13 @@
 	import YoutubePlayer from "$components/YoutubePlayer.svelte";
     import { Duration, DateTime } from "luxon";
 	import Sidebar from "$components/Sidebar.svelte";
-    import { faListOl, faPenToSquare, faTrash, faSave, faSpinner } from "@fortawesome/free-solid-svg-icons";
+    import { faListOl, faPenToSquare, faTrash, faSave, faSpinner, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
     import Fa from "svelte-fa";
 	import NewAnnotationForm from "./NewAnnotationForm.svelte";
     import { error } from "$lib/toast";
 	import EditAnnotationForm from "./EditAnnotationForm.svelte";
 	import { fade } from "svelte/transition";
-	import { invalidateAll } from "$app/navigation";
+	import { goto, invalidateAll } from "$app/navigation";
 
     export let data: PageData;
 
@@ -189,7 +189,14 @@
 <div class={"w-screen h-screen relative"}>
     <div class={"absolute top-0 left-0 flex"}>
         <div class={"overlay-button-container relative"}>
-            <div class={"button-pos-wrapper absolute top-[calc(50vh-32px)] left-5"}>
+            <div class={"button-back-wrapper absolute top-[calc(40vh-32px)] left-5"}>
+                <div class={"tooltip"} data-tip="Back">
+                    <button on:click={() => { goto(".") }} class={"btn btn-neutral rounded-full btn-lg"}>
+                        <Fa icon={faArrowLeft} />
+                    </button>            
+                </div>
+            </div>
+            <div class={"button-timestamps-wrapper absolute top-[calc(50vh-32px)] left-5"}>
                 <div class={"tooltip"} data-tip="Timestamps">
                     <button on:click={() => { leftDrawerOpen = true }} class={"btn btn-neutral rounded-full btn-lg"}>
                         <Fa icon={faListOl} />
@@ -197,7 +204,7 @@
                 </div>
             </div>
             {#if data.communityContributorNick}
-                <div class={"button-pos-wrapper absolute top-[calc(50vh-32px)] left-[calc(100vw-6rem)]"}>
+                <div class={"button-tool-wrapper absolute top-[calc(50vh-32px)] left-[calc(100vw-6rem)]"}>
                     <div class={"tooltip"} data-tip="Open Tools">
                         <button on:click={() => { rightDrawerOpen = true }} class={"btn btn-neutral rounded-full btn-lg "}>
                             <Fa icon={faPenToSquare} />
