@@ -213,13 +213,20 @@ export const contributor = router({
             ]),
         }))
         .mutation(async ({ input }) => {
+            let intermediateData: IntermediateVodData;
+            
+            switch (input.service) {
+                case "Twitch": intermediateData = await createIntermediateYoutubeData(input.video); break;
+                case "Youtube": intermediateData = await createIntermediateYoutubeData(input.video); break;
+                case "Kick": intermediateData = await createIntermediateKickData(input.video); break;
+            }
             return await prisma.communityVod
                 .update({
                     where: {
                         id: input.communityVodId,
                     },
                     data: {
-                        
+                        ...intermediateData
                     }
                 })
         }),
@@ -308,13 +315,13 @@ const createIntermediateYoutubeData = async (videoId: string): Promise<Intermedi
 
     if (youtubeRes.status === 200) {
         if (youtubeRes.data.items.length === 1) {
-            if (youtubeRes.data.items[0].snippet.liveBroadcastContent === "live") {
-                throw new TRPCError({
-                    code: "BAD_REQUEST",
-                    message: "Stream is live - Wait for the stream to end before creating a VOD",
-                    cause: "Server/tRPC.community.createCommunityVod/createIntermediateYoutubeData/Axios/Result"
-                }); 
-            }
+            //if (youtubeRes.data.items[0].snippet.liveBroadcastContent === "live") {
+            //    throw new TRPCError({
+            //        code: "BAD_REQUEST",
+            //        message: "Stream is live - Wait for the stream to end before creating a VOD",
+            //        cause: "Server/tRPC.community.createCommunityVod/createIntermediateYoutubeData/Axios/Result"
+            //    }); 
+            //}
             return {
                 videoId: youtubeRes.data.items[0].id,
                 videoTitle: youtubeRes.data.items[0].snippet.title,
