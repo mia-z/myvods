@@ -17,7 +17,7 @@
     export let data: PageData;
 
     let leftDrawerOpen: boolean = false;
-    let toolsDrawerOpen: boolean = true;
+    let toolsDrawerOpen: boolean = false;
 
     let setTimestamp: ((seek: number) => Promise<void>);
     let videoDuration: number;
