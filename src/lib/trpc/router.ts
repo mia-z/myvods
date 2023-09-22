@@ -5,6 +5,7 @@ import { user } from "$trpcroutes/user";
 import { vod } from "$trpcroutes/vod";
 import { community } from "$trpcroutes/community";
 import { contributor } from "$trpcroutes/contributor";
+import { helpers } from "$trpcroutes/helpers";
 
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 
@@ -14,7 +15,8 @@ export const router = t.router({
     user,
     vod,
     community,
-    contributor
+    contributor,
+    helpers
 });
 
 export type Router = typeof router;

@@ -57,6 +57,7 @@ model CommunityContributor {
     password        String
     tokens          ContributorToken[]
     permissions     CommunityCreator[]
+    power           Int @default(100)
 }
 
 model CommunityCreator {
@@ -77,6 +78,7 @@ model CommunityVod {
     videoThumbUrl       String
     slug                String
     dateRecorded        String
+    duration            String
     communityCreatorId  Int
     communityCreator    CommunityCreator @relation(fields: [communityCreatorId], references: [id])
     annotations         CommunityVodAnnotation[]

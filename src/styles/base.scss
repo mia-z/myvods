@@ -22,3 +22,35 @@
         border-radius: 33% 67% 58% 42% / 63% 68% 32% 37%;
     }
 }
+
+//REMOVE UGLY ARROWS FROM input[type=number]
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+.styled-scrollbars {
+    // --scrollbar-foreground: rgb(66, 65, 65);
+    --scrollbar-foreground: rgb(190, 190, 190);
+    --scrollbar-background: rgba(0,0,0,0);
+    /* Foreground, Background */
+    scrollbar-color: var(--scrollbar-foreground) var(--scrollbar-background);
+}
+.styled-scrollbars::-webkit-scrollbar {
+    width: 7px; /* Mostly for vertical scrollbars */
+    height: 10px; /* Mostly for horizontal scrollbars */
+}
+.styled-scrollbars::-webkit-scrollbar-thumb { /* Foreground */
+    background: var(--scrollbar-foreground);
+    border-radius: 5px;
+}
+.styled-scrollbars::-webkit-scrollbar-track { /* Background */
+    background: var(--scrollbar-background);
+}

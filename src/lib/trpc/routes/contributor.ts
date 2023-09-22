@@ -3,7 +3,7 @@ import prisma from "$lib/server/Prisma";
 import { PUBLIC_GOOGLE_API_KEY } from "$env/static/public";
 import { SECRET_JWT_SECRET } from "$env/static/private";
 import { DateTime } from "luxon";
-import { router, publicProcedure, contributorProcedure } from "../t";
+import { router, publicProcedure, contributorProcedure, authorizeContributor } from "../t";
 import { TRPCError } from "@trpc/server";
 import axios from "axios";
 import { ensureValidThumbnail } from "$lib/utils/YoutubeHelper";
@@ -18,6 +18,8 @@ const SALT_ROUNDS = 9;
 
 export const contributor = router({
     createContributor: contributorProcedure
+        .meta({ requiredPower: 900 })
+        .use(authorizeContributor)
         .input(z.object({
             nick: z.string().trim().max(20).regex(/([a-zA-Z0-9])/),
             password: z.string()
@@ -114,15 +116,20 @@ export const contributor = router({
             }
         }),
     createCommunityCreator: contributorProcedure
+        .use(authorizeContributor)
         .input(z.object({
-            name: z.string()
+            name: z.string(),
+            description: z.string().default(""),
+            imageLink: z.string().default("")
         }))
         .mutation(async ({ input }) => {
             return await prisma.communityCreator
                 .create({
                     data: {
                         name: input.name.trim(),
-                        slug: input.name.trim().toLowerCase()
+                        slug: input.name.trim().toLowerCase().replaceAll(/[^a-zA-Z0-9\s]|\s{2,}/g, "").replace(" ", "-"),
+                        description: input.description.trim(),
+                        imageLink: input.imageLink
                     },
                     select: {
                         name: true
@@ -130,9 +137,12 @@ export const contributor = router({
                 })
         }),
     updateCommunityCreator: contributorProcedure
+        .use(authorizeContributor)
         .input(z.object({
             communityCreatorId: z.number(),
-            name: z.string()
+            name: z.string(),
+            description: z.string().default(""),
+            imageLink: z.string().default("")
         }))
         .mutation(async ({ input }) => {
             return await prisma.communityCreator
@@ -141,13 +151,28 @@ export const contributor = router({
                         id: input.communityCreatorId
                     },
                     data: {
-                        name: input.name
+                        name: input.name,
+                        description: input.description.trim(),
+                        imageLink: input.imageLink
                     }
                 })
         }),
+    deleteCommunityCreator: contributorProcedure
+        .meta({ requiredPower: 500 })
+        .use(authorizeContributor)
+        .input(z.number())
+        .mutation(async ({ input }) => {
+            return await prisma.communityCreator
+                .delete({
+                    where: {
+                        id: input
+                    }
+                });
+        }),
     createCommunityVod: contributorProcedure
+        .use(authorizeContributor)
         .input(z.object({
-            video: z.string(),
+            videoId: z.string(),
             service: z.union([
                 z.literal("Twitch"),
                 z.literal("Youtube"),
@@ -159,9 +184,9 @@ export const contributor = router({
             let intermediateData: IntermediateVodData;
             
             switch (input.service) {
-                case "Twitch": intermediateData = await createIntermediateYoutubeData(input.video); break;
-                case "Youtube": intermediateData = await createIntermediateYoutubeData(input.video); break;
-                case "Kick": intermediateData = await createIntermediateKickData(input.video); break;
+                case "Twitch": intermediateData = await createIntermediateYoutubeData(input.videoId); break;
+                case "Youtube": intermediateData = await createIntermediateYoutubeData(input.videoId); break;
+                case "Kick": intermediateData = await createIntermediateKickData(input.videoId); break;
             }
 
             return await prisma.communityVod
@@ -177,6 +202,7 @@ export const contributor = router({
                 })
         }),
     updateCommunityVod: contributorProcedure
+        .use(authorizeContributor)
         .input(z.object({
             communityVodId: z.number(),
             video: z.string(),
@@ -198,6 +224,8 @@ export const contributor = router({
                 })
         }),
     deleteCommunityVod: contributorProcedure
+        .meta({ requiredPower: 500 })
+        .use(authorizeContributor)
         .input(z.number())
         .mutation(async ({ input }) => {
             return await prisma.communityVod
@@ -208,6 +236,7 @@ export const contributor = router({
                 })
         }),
     createCommunityVodAnnotation: contributorProcedure
+        .use(authorizeContributor)
         .input(z.object({
             communityVodId: z.number(),
             note: z.string().default(""),
@@ -232,11 +261,12 @@ export const contributor = router({
                 })
         }),
     updateCommunityVodAnnotation: contributorProcedure
+        .use(authorizeContributor)
         .input(z.object({
             communityVodAnnotationId: z.number(),
             note: z.string().default(""),
-            subject: z.string().default(""),
-            game: z.string().default(""),
+            subject: z.string().default("Memes"),
+            game: z.string().default("Nothing"),
             timestamp: z.number()
         }))
         .mutation(async ({ input }) => {
@@ -254,6 +284,7 @@ export const contributor = router({
                 })
         }),
     deleteCommunityVodAnnotation: contributorProcedure
+        .use(authorizeContributor)
         .input(z.number())
         .mutation(async ({ input }) => {
             return await prisma.communityVodAnnotation
@@ -261,24 +292,11 @@ export const contributor = router({
                     where: {
                         id: input
                     }
-                })
+                });
         })
 });
 
-const createIntermediateYoutubeData = async (videoIdOrUrl: string): Promise<IntermediateVodData> => {
-    let videoId: string | null = videoIdOrUrl;
-    if (videoId.match(/^(http(s)?:\/\/|www\.)/)) {
-        const urlToExtract = new URL(videoId);
-        videoId = urlToExtract.searchParams.get("v");
-        if (!videoId) {
-            throw new TRPCError({
-                code: "BAD_REQUEST",
-                message: "Couldnt retrieve v parameter from given youtube URL",
-                cause: "Server/tRPC.community.createCommunityVod/createIntermediateYoutubeData/RegEx"
-            });
-        }
-    }
-
+const createIntermediateYoutubeData = async (videoId: string): Promise<IntermediateVodData> => {
     const youtubeUrl = new URL("https://youtube.googleapis.com/youtube/v3/videos");
     youtubeUrl.searchParams.append("part", Array.from(["snippet", "contentDetails", "statistics"]).join(","));
     youtubeUrl.searchParams.append("id", videoId);
@@ -290,11 +308,19 @@ const createIntermediateYoutubeData = async (videoIdOrUrl: string): Promise<Inte
 
     if (youtubeRes.status === 200) {
         if (youtubeRes.data.items.length === 1) {
+            if (youtubeRes.data.items[0].snippet.liveBroadcastContent === "live") {
+                throw new TRPCError({
+                    code: "BAD_REQUEST",
+                    message: "Stream is live - Wait for the stream to end before creating a VOD",
+                    cause: "Server/tRPC.community.createCommunityVod/createIntermediateYoutubeData/Axios/Result"
+                }); 
+            }
             return {
                 videoId: youtubeRes.data.items[0].id,
                 videoTitle: youtubeRes.data.items[0].snippet.title,
                 videoThumbUrl: ensureValidThumbnail(youtubeRes.data.items[0].snippet.thumbnails),
                 dateRecorded: youtubeRes.data.items[0].snippet.publishedAt,
+                duration: youtubeRes.data.items[0].contentDetails.duration,
                 slug: youtubeRes.data.items[0].snippet.title.slice(0, 10).trim().replaceAll(/([\s\-_])+/g, "_").concat("-", youtubeRes.data.items[0].id),
                 service: "Youtube",
             };
@@ -345,6 +371,7 @@ const createIntermediateKickData = async (videoIdOrUrl: string): Promise<Interme
             videoTitle: kickRes.data.livestream.sessionTitle,
             videoThumbUrl: kickRes.data.livestream.thumbnail,
             dateRecorded: kickRes.data.livestream.createdAt.toString(),
+            duration: kickRes.data.livestream.duration.toString(),
             slug: kickRes.data.livestream.sessionTitle.slice(0, 10).trim().replaceAll(/([\s\-_])+/g, "_").concat("-", kickRes.data.id.toString()),
             service: "Kick",
         };

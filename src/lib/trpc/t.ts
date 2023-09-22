@@ -6,7 +6,18 @@ import JWT from "jsonwebtoken";
 import { SECRET_JWT_SECRET } from "$env/static/private";
 import prisma from "$lib/server/Prisma";
 
-export const t = initTRPC.context<Context>().create();
+interface Meta {
+    requiredPower: number
+}
+
+export const t = initTRPC
+    .context<Context>()
+    .meta<Meta>()
+    .create({
+        defaultMeta: {
+            requiredPower: 0
+        }
+    });
 
 export const router = t.router;
 export const procedure = t.procedure;
@@ -26,7 +37,15 @@ const logger = t.middleware(async ({ path, type, next }) => {
     return res;
 });
 
-const authorizeContributor = t.middleware(async ({ ctx, next }) => {
+export const authorizeContributor = t.middleware(async ({ ctx, next, meta }) => {
+    if (!meta) {
+        throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: `NO META`,
+            cause: "tRPC/Server/middleware/authorizeContributor"
+        });
+    }
+
     if (!ctx.contributorCookie) {
         throw new TRPCError({
             code: "UNAUTHORIZED",
@@ -40,11 +59,39 @@ const authorizeContributor = t.middleware(async ({ ctx, next }) => {
     const validId = await prisma.contributorToken.findFirst({
         where: {
             token: verifiedToken
+        },
+        select: {
+            contributor: {
+                select: {
+                    permissions: {
+                        select: {
+                            id: true
+                        }
+                    },
+                    power: true
+                }
+            }
         }
     });
 
     if (validId) {
-        return await next();
+        if (validId.contributor.power >= meta.requiredPower) {
+            return await next({
+                ctx: {
+                    ...ctx,
+                    userPower: validId.contributor.power,
+                    permissions: {
+                        ...validId.contributor.permissions
+                    }
+                }
+            });
+        } else {
+            throw new TRPCError({
+                code: "UNAUTHORIZED",
+                message: `INVALID POWER LEVEL`,
+                cause: "tRPC/Server/middleware/accessChecker"
+            });
+        }
     } else {
         throw new TRPCError({
             code: "UNAUTHORIZED",
@@ -58,6 +105,6 @@ export const loggedProcedure = procedure.use(logger);
 
 export const publicProcedure = loggedProcedure;
 
-export const contributorProcedure = loggedProcedure.use(authorizeContributor);
+export const contributorProcedure = loggedProcedure;
 
 export type Procedure = typeof t.procedure;

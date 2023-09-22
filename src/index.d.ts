@@ -145,13 +145,20 @@ declare namespace YT {
         } | undefined;
     }
     type EventType =
-    "ready" |
-    "stateChange" |
-    "playbackQualityChange" |
-    "playbackRateChange" |
-    "error" |
-    "apiChange" |
-    "volumeChange";
+    "onReady" |
+    "onStateChange" |
+    "onPlaybackQualityChange" |
+    "onPlaybackRateChange" |
+    "onError" |
+    "onApiChange" |
+    "onVolumeChange";
+    enum PlayerState {
+        ENDED = 0,
+        PLAYING = 1,
+        PAUSED = 2,
+        BUFFERING = 3,
+        CUED = 5
+    }
     declare class Player {
         constructor(elementId: string, options: PlayerOptions);
         addEventListener(event: string, listener: (event: CustomEvent) => void): Promise<void>;
@@ -172,514 +179,514 @@ declare namespace YT {
             startSeconds?: number,
             suggestedQuality?: string,
             ): Promise<void>;
-            cuePlaylist(playlist: {
-                listType: string,
-                list?: string | undefined,
-                index?: number | undefined,
-                startSeconds?: number | undefined,
-                suggestedQuality?: string | undefined,
-            }): Promise<void>;
-            loadPlaylist(
-                playlist: string | ReadonlyArray<string>,
-                index?: number,
-                startSeconds?: number,
-                suggestedQuality?: string,
-                ): Promise<void>;
-                loadPlaylist(playlist: {
-                    listType: string,
-                    list?: string | undefined,
-                    index?: number | undefined,
-                    startSeconds?: number | undefined,
-                    suggestedQuality?: string | undefined,
-                }): Promise<void>;
-                getPlaylist(): Promise<ReadonlyArray<string>>;
-                getPlaylistIndex(): Promise<number>;
-                getPlaybackQuality(): Promise<string>;
-                getPlaybackRate(): Promise<number>;
-                getPlayerState(): Promise<PlayerState>;
-                getVideoEmbedCode(): Promise<string>;
-                getVideoLoadedFraction(): Promise<number>;
-                getVideoUrl(): Promise<string>;
-                getVolume(): Promise<number>;
-                cueVideoById(videoId: string, startSeconds?: number, suggestedQuality?: string): Promise<void>;
-                cueVideoById(video: {
-                    videoId: string,
-                    startSeconds?: number | undefined,
-                    endSeconds?: number | undefined,
-                    suggestedQuality?: string | undefined,
-                }): Promise<void>;
-                cueVideoByUrl(mediaContentUrl: string, startSeconds?: number, suggestedQuality?: string): Promise<void>;
-                cueVideoByUrl(video: {
-                    mediaContentUrl: string,
-                    startSeconds?: number | undefined,
-                    endSeconds?: number | undefined,
-                    suggestedQuality?: string | undefined,
-                }): Promise<void>;
-                loadVideoByUrl(mediaContentUrl: string, startSeconds?: number, suggestedQuality?: string): Promise<void>;
-                loadVideoByUrl(video: {
-                    mediaContentUrl: string,
-                    startSeconds?: number | undefined,
-                    endSeconds?: number | undefined,
-                    suggestedQuality?: string | undefined,
-                }): Promise<void>;
-                loadVideoById(videoId: string, startSeconds?: number, suggestedQuality?: string): Promise<void>;
-                loadVideoById(video: {
-                    videoId: string,
-                    startSeconds?: number | undefined,
-                    endSeconds?: number | undefined,
-                    suggestedQuality?: string | undefined,
-                }): Promise<void>;
-                isMuted(): Promise<boolean>;
-                mute(): Promise<void>;
-                nextVideo(): Promise<void>;
-                pauseVideo(): Promise<void>;
-                playVideo(): Promise<void>;
-                playVideoAt(index: number): Promise<void>;
-                previousVideo(): Promise<void>;
-                removeEventListener(event: string, listener: (event: CustomEvent) => void): Promise<void>;
-                seekTo(seconds: number, allowSeekAhead: boolean): Promise<void>;
-                setLoop(loopPlaylists: boolean): Promise<void>;
-                setPlaybackQuality(suggestedQuality: string): Promise<void>;
-                setPlaybackRate(suggestedRate: number): Promise<void>;
-                setShuffle(shufflePlaylist: boolean): Promise<void>;
-                getSize(): Promise<PlayerSize>;
-                setSize(width: number, height: number): Promise<object>;
-                setVolume(volume: number): Promise<void>;
-                stopVideo(): Promise<void>;
-                unMute(): Promise<void>;
-                on(eventType: "stateChange", listener: (event: CustomEvent & { data: number }) => void): void;
-                on(eventType: EventType, listener: (event: CustomEvent) => void): void;
-            }
-        }
+        cuePlaylist(playlist: {
+            listType: string,
+            list?: string | undefined,
+            index?: number | undefined,
+            startSeconds?: number | undefined,
+            suggestedQuality?: string | undefined,
+        }): Promise<void>;
+        loadPlaylist(
+            playlist: string | ReadonlyArray<string>,
+            index?: number,
+            startSeconds?: number,
+            suggestedQuality?: string,
+            ): Promise<void>;
+        loadPlaylist(playlist: {
+            listType: string,
+            list?: string | undefined,
+            index?: number | undefined,
+            startSeconds?: number | undefined,
+            suggestedQuality?: string | undefined,
+        }): Promise<void>;
+        getPlaylist(): Promise<ReadonlyArray<string>>;
+        getPlaylistIndex(): Promise<number>;
+        getPlaybackQuality(): Promise<string>;
+        getPlaybackRate(): Promise<number>;
+        getPlayerState(): Promise<PlayerState>;
+        getVideoEmbedCode(): Promise<string>;
+        getVideoLoadedFraction(): Promise<number>;
+        getVideoUrl(): Promise<string>;
+        getVolume(): Promise<number>;
+        cueVideoById(videoId: string, startSeconds?: number, suggestedQuality?: string): Promise<void>;
+        cueVideoById(video: {
+            videoId: string,
+            startSeconds?: number | undefined,
+            endSeconds?: number | undefined,
+            suggestedQuality?: string | undefined,
+        }): Promise<void>;
+        cueVideoByUrl(mediaContentUrl: string, startSeconds?: number, suggestedQuality?: string): Promise<void>;
+        cueVideoByUrl(video: {
+            mediaContentUrl: string,
+            startSeconds?: number | undefined,
+            endSeconds?: number | undefined,
+            suggestedQuality?: string | undefined,
+        }): Promise<void>;
+        loadVideoByUrl(mediaContentUrl: string, startSeconds?: number, suggestedQuality?: string): Promise<void>;
+        loadVideoByUrl(video: {
+            mediaContentUrl: string,
+            startSeconds?: number | undefined,
+            endSeconds?: number | undefined,
+            suggestedQuality?: string | undefined,
+        }): Promise<void>;
+        loadVideoById(videoId: string, startSeconds?: number, suggestedQuality?: string): Promise<void>;
+        loadVideoById(video: {
+            videoId: string,
+            startSeconds?: number | undefined,
+            endSeconds?: number | undefined,
+            suggestedQuality?: string | undefined,
+        }): Promise<void>;
+        isMuted(): Promise<boolean>;
+        mute(): Promise<void>;
+        nextVideo(): Promise<void>;
+        pauseVideo(): Promise<void>;
+        playVideo(): Promise<void>;
+        playVideoAt(index: number): Promise<void>;
+        previousVideo(): Promise<void>;
+        removeEventListener(event: string, listener: (event: CustomEvent) => void): Promise<void>;
+        seekTo(seconds: number, allowSeekAhead: boolean): Promise<void>;
+        setLoop(loopPlaylists: boolean): Promise<void>;
+        setPlaybackQuality(suggestedQuality: string): Promise<void>;
+        setPlaybackRate(suggestedRate: number): Promise<void>;
+        setShuffle(shufflePlaylist: boolean): Promise<void>;
+        getSize(): Promise<PlayerSize>;
+        setSize(width: number, height: number): Promise<object>;
+        setVolume(volume: number): Promise<void>;
+        stopVideo(): Promise<void>;
+        unMute(): Promise<void>;
+        on(eventType: "onStateChange", listener: (event: CustomEvent & { data: YT.PlayerState }) => void): void;
+        on(eventType: EventType, listener: (event: CustomEvent) => void): void;
+    }
+}
         
-        declare namespace Youtube {
-            //Common and base
-            interface YoutubeBaseObject {
-                kind: string;
-                etag: string;
-            }
-            interface ResponseBase extends YoutubeBaseObject {
-                pageInfo: PageInfo
-            }
-            interface PageInfo {
-                totalResults: number,
-                resultsPerPage: number
-            }
-            interface ThumbnailCollection {
-                [thumbnailName: string]: Thumbnail;
-            }
-            interface Thumbnail {
-                url: string;
-                width: number;
-                height: number;
-            }
-            interface ResourceId {
-                kind: string;
-                videoId: string;
-            }
-            interface SnippetBase {
-                title: string;
-                description: string;
-                publishedAt: string;
-                thumbnails: ThumbnailCollection;
-            }
-            //Playlist
-            interface PlaylistListResponse extends ResponseBase {
-                nextPageToken?: string;
-                prevPageToken?: string;
-                pageInfo: PageInfo;
-                items: Playlist[];
-            } 
-            interface Playlist extends YoutubeBaseObject {
-                snippet: PlaylistSnippet;
-                status: PlaylistStatus;
-                contentDetails: PlaylistContentDetails;
-                player: PlaylistPlayer;
-            }
-            interface PlaylistSnippet extends SnippetBase {
-                channelId: string;
-                channelTitle: string;
-                defaultLanguage: string;
-            }
-            interface PlaylistStatus {
-                privacyStatus: "public" | "private" | "unlisted";
-            }
-            interface PlaylistContentDetails {
-                itemCount: number;
-            }
-            interface PlaylistPlayer {
-                embedHtml: string;
-            }
-            //Playlist Items
-            interface PlaylistItemsResponse extends ResponseBase {
-                nextPageToken?: string;
-                prevPageToken?: string;
-                pageInfo: PageInfo;
-                items: PlaylistItem[];
-            }
-            interface PlaylistItem extends YoutubeBaseObject {
-                id: string;
-                snippet: PlaylistItemSnippet;
-                status: PlaylistItemStatus;
-            }
-            interface PlaylistItemStatus {
-                privacyStatus: "public" | "private" | "unlisted";
-            }
-            interface PlaylistItemSnippet extends SnippetBase {
-                resourceId: ResourceId;
-                channelId: string;
-                channelTitle: string;
-                playlistId: string;
-                position: number;
-                videoOwnerChannelTitle: string;
-                videoOwnerChannelId: string;
-            }
-            //Videos
-            interface VideoListResponse extends ResponseBase {
-                items: Video[]
-            }
-            interface Video extends YoutubeBaseObject {
-                id: string;
-                snippet: VideoSnippet;
-                contentDetails: VideoContentDetails;
-                statistics: VideoStatistics;
-                liveStreamingDetails: LiveStreamingDetails;
-            }
-            interface VideoSnippet {
-                publishedAt: string;
-                channelId: string;
-                title: string;
-                description: string;
-                thumbnails: ThumbnailCollection;
-                channelTitle: string;
-                tags: string[];
-                categoryId: string;
-                liveBroadcastContent: string;
-            }
-            interface VideoContentDetails {
-                duration: string;
-                dimension: string;
-                definition: string;
-                caption: boolean;
-                licensedContent: boolean;
-                contentRating: {
-                    ytRating: string;
-                },
-                projection: string;
-            }
-            interface VideoStatistics {
-                viewCount: number,
-                likeCount: number,
-                favoriteCount: number
-            }
-            interface LiveStreamingDetails {
-                actualStartTime: string;
-                actualEndTime: string;
-            }
-            //Channels
-            interface ChannelListResponse extends ResponseBase {
-                items: Channel[]
-                nextPageToken?: string;
-                prevPageToken?: string;
-                pageInfo: PageInfo;
-            }
-            interface Channel extends YoutubeBaseObject {
-                snippet: ChannelSnippet;
-                contentDetails: ChannelContentDetails;
-                statistics: ChannelStatistics;
-                status: ChannelStatus
-            }
-            interface ChannelSnippet extends SnippetBase {
-                customUrl: string;
-                country: string;
-                defaultLanguage: string;
-                localized: {
-                    title: string;
-                    description: string
-                };
-            }
-            interface ChannelContentDetails {
-                relatedPlaylists: {
-                    likes: string;
-                    favorites: string;
-                    uploads: string
-                };
-            }
-            interface ChannelStatistics {
-                viewCount: number;
-                subscriberCount: number;
-                hiddenSubscriberCount: boolean;
-                videoCount: number;
-            }
-            interface ChannelStatus {
-                privacyStatus: string;
-                isLinked: boolean;
-                longUploadStatus: string;
-                madeForKids: boolean;
-                selfDeclaredMadeForKids: boolean;
-            }
-            //Search
-            interface SearchListResponse<T extends Channel | Playlist | Video> extends ResponseBase {
-                items: SearchResult<T>[];
-                nextPageToken?: string;
-                prevPageToken?: string;
-                pageInfo: PageInfo;
-            }
-            interface SearchResult<T extends Channel | Playlist | Video> extends YoutubeBaseObject {
-                id: T extends Channel ? SearchResultChannelId :
-                T extends Playlist ? SearchResultPlaylistId :
-                T extends Video ? SearchResultPlaylistId :
-                never;
-                snippet: SearchResultSnippet;
-            }
-            interface SearchResultVideoId {
-                kind: "youtube#video",
-                videoId: string;
-            }
-            interface SearchResultChannelId {
-                kind: "youtube#channel",
-                channelId: string;
-            }
-            interface SearchResultPlaylistId {
-                kind: "youtube#playlist",
-                playlistId: string;
-            }
-            interface SearchResultSnippet {
-                channelId: string;
-                channelTitle: string;
-                liveBroadcastContent: string;
-            }
-        }
-        
-        /**
-        * DATA SOURCED FROM 
-        * https://kick.com/api/v1/users/destiny
-        * https://kick.com/api/v1/channels/destiny
-        * https://kick.com/api/v1/video/909ed367-f986-4ab4-bdcb-e26483a4951f
-        */
-        declare namespace Kick {
-            interface Channel {
-                id: number;
-                userID: number;
-                slug: string;
-                isBanned: boolean;
-                playbackURL: string;
-                nameUpdatedAt: null;
-                vodEnabled: boolean;
-                subscriptionEnabled: boolean;
-                followersCount: number;
-                subscriberBadges: SubscriberBadge[];
-                bannerImage: Banner;
-                recentCategories: RecentCategoryElement[];
-                livestream: null;
-                role: null;
-                muted: boolean;
-                followerBadges: any[];
-                offlineBannerImage: OfflineBannerImage;
-                canHost: boolean;
-                user: UserClass;
-                chatroom: Chatroom;
-                ascendingLinks: any[];
-                plan: Plan;
-                previousLivestreams: PreviousLivestream[];
-                verified: Verified;
-                media: Media[];
-            }
-            
-            interface Banner {
-                responsive: string;
-                url: string;
-            }
-            
-            interface Chatroom {
-                id: number;
-                chatableType: string;
-                channelID: number;
-                createdAt: Date;
-                updatedAt: Date;
-                chatModeOld: string;
-                chatMode: string;
-                slowMode: boolean;
-                chatableID: number;
-                followersMode: boolean;
-                subscribersMode: boolean;
-                emotesMode: boolean;
-                messageInterval: number;
-                followingMinDuration: number;
-            }
-            
-            interface Media {
-                id: number;
-                modelType: string;
-                modelID: number;
-                collectionName: string;
-                name: string;
-                fileName: string;
-                mimeType: string;
-                disk: string;
-                size: number;
-                manipulations: any[];
-                customProperties: CustomProperties;
-                responsiveImages: any[] | ResponsiveImagesClass;
-                orderColumn: number;
-                createdAt: Date;
-                updatedAt: Date;
-                uuid: string;
-                conversionsDisk:  string;
-            }
-            
-            interface CustomProperties {
-                generatedConversions: GeneratedConversions;
-            }
-            
-            interface GeneratedConversions {
-                fullsize: boolean;
-                medium?: boolean;
-            }
-            
-            interface ResponsiveImagesClass {
-                fullsize: Fullsize;
-            }
-            
-            interface Fullsize {
-                urls: string[];
-                base64SVG: string;
-            }
-            
-            interface OfflineBannerImage {
-                src: string;
-                srcset: string;
-            }
-            
-            interface Plan {
-                id: number;
-                channelID: number;
-                stripePlanID: string;
-                amount: string;
-                createdAt: Date;
-                updatedAt: Date;
-            }
-            
-            interface PreviousLivestream {
-                id: number;
-                slug: string;
-                channelID: number;
-                createdAt: Date;
-                sessionTitle: string;
-                isLive: boolean;
-                riskLevelID: null;
-                startTime: Date;
-                source: null;
-                twitchChannel: null;
-                duration: number;
-                language: string;
-                isMature: boolean;
-                viewerCount: number;
-                thumbnail: OfflineBannerImage;
-                views: number;
-                tags: string[];
-                categories: RecentCategory[];
-                video: Video;
-            }
-            
-            interface Category {
-                id: number;
-                categoryID: number;
-                name: string;
-                slug: string;
-                tags: string[];
-                description: null;
-                deletedAt: null;
-                viewers: number;
-                banner: Banner;
-                category: CategoryMeta;
-            }
-            
-            interface CategoryMeta {
-                id: number;
-                name: string;
-                slug: string;
-                icon: string;
-            }
-            
-            interface Video {
-                id: number;
-                liveStreamID: number;
-                slug: null;
-                thumb: null;
-                s3: null;
-                tradingPlatformID: null;
-                createdAt: Date;
-                updatedAt: Date;
-                uuid: string;
-                views: number;
-                deletedAt: null;
-            }
-            
-            interface SubscriberBadge {
-                id: number;
-                channelID: number;
-                months: number;
-                badgeImage: OfflineBannerImage;
-            }
-            
-            interface User {
-                id: number;
-                username: string;
-                agreedToTerms: boolean;
-                emailVerifiedAt: Date;
-                bio: string;
-                country: string;
-                state: string;
-                city: string;
-                instagram: string;
-                twitter: string;
-                youtube: string;
-                discord: string;
-                tiktok: string;
-                facebook: string;
-                profilePic: string;
-            }
-            
-            interface Verified {
-                id: number;
-                channelID: number;
-                createdAt: Date;
-                updatedAt: Date;
-            }
-            
-            interface Video {
-                id:                number;
-                liveStreamID:      number;
-                slug:              null;
-                thumb:             null;
-                s3:                null;
-                tradingPlatformID: null;
-                createdAt:         Date;
-                updatedAt:         Date;
-                uuid:              string;
-                views:             number;
-                deletedAt:         null;
-                source:            string;
-                livestream:        Livestream;
-            }
-            interface Livestream {
-                id:            number;
-                slug:          string;
-                channelID:     number;
-                createdAt:     Date;
-                sessionTitle:  string;
-                isLive:        boolean;
-                riskLevelID:   null;
-                startTime:     Date;
-                source:        null;
-                twitchChannel: null;
-                duration:      number;
-                language:      string;
-                isMature:      boolean;
-                viewerCount:   number;
-                thumbnail:     string;
-                channel:       Channel;
-                categories:    Category[];
-            }
-        }
+declare namespace Youtube {
+    //Common and base
+    interface YoutubeBaseObject {
+        kind: string;
+        etag: string;
+    }
+    interface ResponseBase extends YoutubeBaseObject {
+        pageInfo: PageInfo
+    }
+    interface PageInfo {
+        totalResults: number,
+        resultsPerPage: number
+    }
+    interface ThumbnailCollection {
+        [thumbnailName: string]: Thumbnail;
+    }
+    interface Thumbnail {
+        url: string;
+        width: number;
+        height: number;
+    }
+    interface ResourceId {
+        kind: string;
+        videoId: string;
+    }
+    interface SnippetBase {
+        title: string;
+        description: string;
+        publishedAt: string;
+        thumbnails: ThumbnailCollection;
+    }
+    //Playlist
+    interface PlaylistListResponse extends ResponseBase {
+        nextPageToken?: string;
+        prevPageToken?: string;
+        pageInfo: PageInfo;
+        items: Playlist[];
+    } 
+    interface Playlist extends YoutubeBaseObject {
+        snippet: PlaylistSnippet;
+        status: PlaylistStatus;
+        contentDetails: PlaylistContentDetails;
+        player: PlaylistPlayer;
+    }
+    interface PlaylistSnippet extends SnippetBase {
+        channelId: string;
+        channelTitle: string;
+        defaultLanguage: string;
+    }
+    interface PlaylistStatus {
+        privacyStatus: "public" | "private" | "unlisted";
+    }
+    interface PlaylistContentDetails {
+        itemCount: number;
+    }
+    interface PlaylistPlayer {
+        embedHtml: string;
+    }
+    //Playlist Items
+    interface PlaylistItemsResponse extends ResponseBase {
+        nextPageToken?: string;
+        prevPageToken?: string;
+        pageInfo: PageInfo;
+        items: PlaylistItem[];
+    }
+    interface PlaylistItem extends YoutubeBaseObject {
+        id: string;
+        snippet: PlaylistItemSnippet;
+        status: PlaylistItemStatus;
+    }
+    interface PlaylistItemStatus {
+        privacyStatus: "public" | "private" | "unlisted";
+    }
+    interface PlaylistItemSnippet extends SnippetBase {
+        resourceId: ResourceId;
+        channelId: string;
+        channelTitle: string;
+        playlistId: string;
+        position: number;
+        videoOwnerChannelTitle: string;
+        videoOwnerChannelId: string;
+    }
+    //Videos
+    interface VideoListResponse extends ResponseBase {
+        items: Video[]
+    }
+    interface Video extends YoutubeBaseObject {
+        id: string;
+        snippet: VideoSnippet;
+        contentDetails: VideoContentDetails;
+        statistics: VideoStatistics;
+        liveStreamingDetails: LiveStreamingDetails;
+    }
+    interface VideoSnippet {
+        publishedAt: string;
+        channelId: string;
+        title: string;
+        description: string;
+        thumbnails: ThumbnailCollection;
+        channelTitle: string;
+        tags: string[];
+        categoryId: string;
+        liveBroadcastContent: string;
+    }
+    interface VideoContentDetails {
+        duration: string;
+        dimension: string;
+        definition: string;
+        caption: boolean;
+        licensedContent: boolean;
+        contentRating: {
+            ytRating: string;
+        },
+        projection: string;
+    }
+    interface VideoStatistics {
+        viewCount: number,
+        likeCount: number,
+        favoriteCount: number
+    }
+    interface LiveStreamingDetails {
+        actualStartTime: string;
+        actualEndTime: string;
+    }
+    //Channels
+    interface ChannelListResponse extends ResponseBase {
+        items: Channel[]
+        nextPageToken?: string;
+        prevPageToken?: string;
+        pageInfo: PageInfo;
+    }
+    interface Channel extends YoutubeBaseObject {
+        snippet: ChannelSnippet;
+        contentDetails: ChannelContentDetails;
+        statistics: ChannelStatistics;
+        status: ChannelStatus
+    }
+    interface ChannelSnippet extends SnippetBase {
+        customUrl: string;
+        country: string;
+        defaultLanguage: string;
+        localized: {
+            title: string;
+            description: string
+        };
+    }
+    interface ChannelContentDetails {
+        relatedPlaylists: {
+            likes: string;
+            favorites: string;
+            uploads: string
+        };
+    }
+    interface ChannelStatistics {
+        viewCount: number;
+        subscriberCount: number;
+        hiddenSubscriberCount: boolean;
+        videoCount: number;
+    }
+    interface ChannelStatus {
+        privacyStatus: string;
+        isLinked: boolean;
+        longUploadStatus: string;
+        madeForKids: boolean;
+        selfDeclaredMadeForKids: boolean;
+    }
+    //Search
+    interface SearchListResponse<T extends Channel | Playlist | Video> extends ResponseBase {
+        items: SearchResult<T>[];
+        nextPageToken?: string;
+        prevPageToken?: string;
+        pageInfo: PageInfo;
+    }
+    interface SearchResult<T extends Channel | Playlist | Video> extends YoutubeBaseObject {
+        id: T extends Channel ? SearchResultChannelId :
+        T extends Playlist ? SearchResultPlaylistId :
+        T extends Video ? SearchResultPlaylistId :
+        never;
+        snippet: SearchResultSnippet;
+    }
+    interface SearchResultVideoId {
+        kind: "youtube#video",
+        videoId: string;
+    }
+    interface SearchResultChannelId {
+        kind: "youtube#channel",
+        channelId: string;
+    }
+    interface SearchResultPlaylistId {
+        kind: "youtube#playlist",
+        playlistId: string;
+    }
+    interface SearchResultSnippet {
+        channelId: string;
+        channelTitle: string;
+        liveBroadcastContent: string;
+    }
+}
+
+/**
+* DATA SOURCED FROM 
+* https://kick.com/api/v1/users/destiny
+* https://kick.com/api/v1/channels/destiny
+* https://kick.com/api/v1/video/909ed367-f986-4ab4-bdcb-e26483a4951f
+*/
+declare namespace Kick {
+    interface Channel {
+        id: number;
+        userID: number;
+        slug: string;
+        isBanned: boolean;
+        playbackURL: string;
+        nameUpdatedAt: null;
+        vodEnabled: boolean;
+        subscriptionEnabled: boolean;
+        followersCount: number;
+        subscriberBadges: SubscriberBadge[];
+        bannerImage: Banner;
+        recentCategories: RecentCategoryElement[];
+        livestream: null;
+        role: null;
+        muted: boolean;
+        followerBadges: any[];
+        offlineBannerImage: OfflineBannerImage;
+        canHost: boolean;
+        user: UserClass;
+        chatroom: Chatroom;
+        ascendingLinks: any[];
+        plan: Plan;
+        previousLivestreams: PreviousLivestream[];
+        verified: Verified;
+        media: Media[];
+    }
+    
+    interface Banner {
+        responsive: string;
+        url: string;
+    }
+    
+    interface Chatroom {
+        id: number;
+        chatableType: string;
+        channelID: number;
+        createdAt: Date;
+        updatedAt: Date;
+        chatModeOld: string;
+        chatMode: string;
+        slowMode: boolean;
+        chatableID: number;
+        followersMode: boolean;
+        subscribersMode: boolean;
+        emotesMode: boolean;
+        messageInterval: number;
+        followingMinDuration: number;
+    }
+    
+    interface Media {
+        id: number;
+        modelType: string;
+        modelID: number;
+        collectionName: string;
+        name: string;
+        fileName: string;
+        mimeType: string;
+        disk: string;
+        size: number;
+        manipulations: any[];
+        customProperties: CustomProperties;
+        responsiveImages: any[] | ResponsiveImagesClass;
+        orderColumn: number;
+        createdAt: Date;
+        updatedAt: Date;
+        uuid: string;
+        conversionsDisk:  string;
+    }
+    
+    interface CustomProperties {
+        generatedConversions: GeneratedConversions;
+    }
+    
+    interface GeneratedConversions {
+        fullsize: boolean;
+        medium?: boolean;
+    }
+    
+    interface ResponsiveImagesClass {
+        fullsize: Fullsize;
+    }
+    
+    interface Fullsize {
+        urls: string[];
+        base64SVG: string;
+    }
+    
+    interface OfflineBannerImage {
+        src: string;
+        srcset: string;
+    }
+    
+    interface Plan {
+        id: number;
+        channelID: number;
+        stripePlanID: string;
+        amount: string;
+        createdAt: Date;
+        updatedAt: Date;
+    }
+    
+    interface PreviousLivestream {
+        id: number;
+        slug: string;
+        channelID: number;
+        createdAt: Date;
+        sessionTitle: string;
+        isLive: boolean;
+        riskLevelID: null;
+        startTime: Date;
+        source: null;
+        twitchChannel: null;
+        duration: number;
+        language: string;
+        isMature: boolean;
+        viewerCount: number;
+        thumbnail: OfflineBannerImage;
+        views: number;
+        tags: string[];
+        categories: RecentCategory[];
+        video: Video;
+    }
+    
+    interface Category {
+        id: number;
+        categoryID: number;
+        name: string;
+        slug: string;
+        tags: string[];
+        description: null;
+        deletedAt: null;
+        viewers: number;
+        banner: Banner;
+        category: CategoryMeta;
+    }
+    
+    interface CategoryMeta {
+        id: number;
+        name: string;
+        slug: string;
+        icon: string;
+    }
+    
+    interface Video {
+        id: number;
+        liveStreamID: number;
+        slug: null;
+        thumb: null;
+        s3: null;
+        tradingPlatformID: null;
+        createdAt: Date;
+        updatedAt: Date;
+        uuid: string;
+        views: number;
+        deletedAt: null;
+    }
+    
+    interface SubscriberBadge {
+        id: number;
+        channelID: number;
+        months: number;
+        badgeImage: OfflineBannerImage;
+    }
+    
+    interface User {
+        id: number;
+        username: string;
+        agreedToTerms: boolean;
+        emailVerifiedAt: Date;
+        bio: string;
+        country: string;
+        state: string;
+        city: string;
+        instagram: string;
+        twitter: string;
+        youtube: string;
+        discord: string;
+        tiktok: string;
+        facebook: string;
+        profilePic: string;
+    }
+    
+    interface Verified {
+        id: number;
+        channelID: number;
+        createdAt: Date;
+        updatedAt: Date;
+    }
+    
+    interface Video {
+        id:                number;
+        liveStreamID:      number;
+        slug:              null;
+        thumb:             null;
+        s3:                null;
+        tradingPlatformID: null;
+        createdAt:         Date;
+        updatedAt:         Date;
+        uuid:              string;
+        views:             number;
+        deletedAt:         null;
+        source:            string;
+        livestream:        Livestream;
+    }
+    interface Livestream {
+        id:            number;
+        slug:          string;
+        channelID:     number;
+        createdAt:     Date;
+        sessionTitle:  string;
+        isLive:        boolean;
+        riskLevelID:   null;
+        startTime:     Date;
+        source:        null;
+        twitchChannel: null;
+        duration:      number;
+        language:      string;
+        isMature:      boolean;
+        viewerCount:   number;
+        thumbnail:     string;
+        channel:       Channel;
+        categories:    Category[];
+    }
+}

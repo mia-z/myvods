@@ -30,7 +30,7 @@
             await invalidateAll();
             setTimeout(() => {
                 loginModal.close();
-            }, 3000);
+            }, 1500);
         } catch (e) {
             if (e instanceof TRPCClientError) {
                 loginError = e.message
