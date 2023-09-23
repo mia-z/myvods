@@ -5,13 +5,20 @@ import { z } from "zod";
 import { message, setError, superValidate } from "sveltekit-superforms/client";
 import prisma from "$lib/server/Prisma";
 import { TRPCClientError } from "@trpc/client";
+import type { CommunityVod } from "@prisma/client";
+import axios from "axios";
+import { PUBLIC_GOOGLE_API_KEY } from "$env/static/public";
+import { ensureValidThumbnail } from "$lib/utils/YoutubeHelper";
+
+type IntermediateVodData = Omit<CommunityVod, "id">;
 
 const newVodFormSchema = z.object({
-    videoId: z.string().nonempty("Must enter a video ID or valid URL"),
+    video: z.string().nonempty("Must enter a video ID or valid URL"),
     service: z.union([
         z.literal("Twitch"),
         z.literal("Youtube"),
-        z.literal("Kick")
+        z.literal("Kick"),
+        z.literal("Rumble")
     ]).default("Youtube"),
     communityCreatorId: z.number()
 });
@@ -20,10 +27,10 @@ export const load: PageServerLoad = async (event: PageServerLoadEvent) => {
     const communityCreatorAndVods = await trpc(event).community.getCommunityCreatorBySlugWithVods.query(event.params.communityCreatorSlug);
     
     if (communityCreatorAndVods) {
-            const newVodForm = await superValidate(newVodFormSchema);
-            return {
-                communityCreatorAndVods,
-                newVodForm
+        const newVodForm = await superValidate(newVodFormSchema);
+        return {
+            communityCreatorAndVods,
+            newVodForm
         };
     } else {
         throw error(404, "Community Creator Not found");
@@ -38,32 +45,54 @@ export const actions = {
             return fail(400, { newVodForm });
         }
 
-        if (newVodForm.data.videoId.match(/^(http(s)?:\/\/|www\.)/)) {
-            const urlToExtract = new URL(newVodForm.data.videoId);
-            const videoIdFromParameter = urlToExtract.searchParams.get("v");
-            if (!videoIdFromParameter) {
-                return setError(newVodForm, "videoId", "Couldnt parse Video ID parameter from URL");
-            } else {
-                newVodForm.data.videoId = videoIdFromParameter
-            }
-        }
+        let intermediateVodData: IntermediateVodData;
+        switch(newVodForm.data.service) {
+            case "Twitch": throw new Error("Not implemented");
+            case "Youtube": {
+                if (newVodForm.data.video.match(/^(http(s)?:\/\/|www\.)/)) {
+                    const urlToExtract = new URL(newVodForm.data.video);
+                    const videoIdFromParameter = urlToExtract.searchParams.get("v");
+                    if (!videoIdFromParameter) {
+                        return setError(newVodForm, "video", "Couldnt parse Youtube Video ID parameter from URL");
+                    } else newVodForm.data.video = videoIdFromParameter
+                }
 
-        const isDuplicate = await prisma.communityVod.count({
-            where: {
-                videoId: newVodForm.data.videoId
+                const youtubeUrl = new URL("https://youtube.googleapis.com/youtube/v3/videos");
+                youtubeUrl.searchParams.append("part", Array.from(["snippet", "contentDetails", "statistics"]).join(","));
+                youtubeUrl.searchParams.append("id", newVodForm.data.video);
+                youtubeUrl.searchParams.append("key", PUBLIC_GOOGLE_API_KEY);
+                
+                const youtubeRes = await axios.get<Youtube.VideoListResponse>(youtubeUrl.href, {
+                    validateStatus: () => true
+                });
+                if (youtubeRes.status === 200) {
+                    if (youtubeRes.data.items.length === 1) {
+                        intermediateVodData = {
+                            videoId: youtubeRes.data.items[0].id,
+                            videoSource: "",
+                            communityCreatorId: newVodForm.data.communityCreatorId,
+                            videoTitle: youtubeRes.data.items[0].snippet.title,
+                            videoThumbUrl: ensureValidThumbnail(youtubeRes.data.items[0].snippet.thumbnails),
+                            dateRecorded: youtubeRes.data.items[0].snippet.publishedAt,
+                            duration: youtubeRes.data.items[0].contentDetails.duration,
+                            slug: youtubeRes.data.items[0].snippet.title.slice(0, 10).trim().replaceAll(/([\s\-_])+/g, "_").concat("-", youtubeRes.data.items[0].id),
+                            service: "Youtube",
+                        };
+                    } else {
+                        return setError(newVodForm, "video", "Youtube items.length wasn't exactly one(1)");
+                    }
+                } else {
+                    return setError(newVodForm, "video", "Didnt get 200 from YouTube when getting video data");
+                }
+                break;
             }
-        });
-
-        if (isDuplicate > 0) {
-            return setError(newVodForm, "videoId", "Video ID already exists");
+            case "Kick": throw new Error("Not implemented");
+            case "Rumble": throw new Error("Not implemented");
+            default: throw new Error("Unable to determine video service");
         }
 
         try {
-            await trpc(event).contributor.createCommunityVod.mutate({
-                communityCreatorId: newVodForm.data.communityCreatorId,
-                service: newVodForm.data.service,
-                videoId: newVodForm.data.videoId
-            });
+            await trpc(event).contributor.createCommunityVod.mutate(intermediateVodData);
 
             return message(newVodForm, "Vod created!");
         } catch (e) {
