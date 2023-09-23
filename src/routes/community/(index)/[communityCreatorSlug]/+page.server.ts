@@ -20,17 +20,11 @@ export const load: PageServerLoad = async (event: PageServerLoadEvent) => {
     const communityCreatorAndVods = await trpc(event).community.getCommunityCreatorBySlugWithVods.query(event.params.communityCreatorSlug);
     
     if (communityCreatorAndVods) {
-        if (event.locals.communityContributorNick) {
             const newVodForm = await superValidate(newVodFormSchema);
             return {
                 communityCreatorAndVods,
                 newVodForm
-            }
-        } else {
-            return {
-                communityCreatorAndVods
-            }
-        }
+        };
     } else {
         throw error(404, "Community Creator Not found");
     }

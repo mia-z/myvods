@@ -44,22 +44,14 @@ const editCreatorSchema = z.object({
 
 export const load: PageServerLoad = async (event: PageServerLoadEvent) => {
     const communityCreators = await trpc(event).community.getCommunityCreators.query();
-
-    if (event.locals.communityContributorNick) {
-        const newCreatorForm = await superValidate(newCreatorSchema);
-        const editCreatorForm = await superValidate(editCreatorSchema);
-
-        return {
-            communityCreators,
-            newCreatorForm,
-            editCreatorForm
-        }
-    } else {
-        return {
-            communityCreators
-        }
-    }
-
+    const newCreatorForm = await superValidate(newCreatorSchema);
+    const editCreatorForm = await superValidate(editCreatorSchema);
+    
+    return {
+        communityCreators,
+        newCreatorForm,
+        editCreatorForm
+    };
 }
 
 export const actions = {
