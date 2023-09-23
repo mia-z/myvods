@@ -73,8 +73,9 @@ model CommunityCreator {
 model CommunityVod {
     id                  Int @id @default(autoincrement())
     service             VideoService
+    videoSource         String
     videoTitle          String
-    videoId             String
+    videoId             String @unique
     videoThumbUrl       String
     slug                String
     dateRecorded        String
