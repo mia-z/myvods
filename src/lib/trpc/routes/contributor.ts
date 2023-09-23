@@ -12,8 +12,6 @@ import bcrypt from "bcrypt";
 import JWT from "jsonwebtoken";
 import { v4 as uuid } from "uuid";
 
-type IntermediateVodData = Omit<CommunityVod, "communityCreatorId" | "id">;
-
 const SALT_ROUNDS = 9;
 
 export const contributor = router({
@@ -172,27 +170,33 @@ export const contributor = router({
     createCommunityVod: contributorProcedure
         .use(authorizeContributor)
         .input(z.object({
-            videoId: z.string(),
             service: z.union([
                 z.literal("Twitch"),
                 z.literal("Youtube"),
-                z.literal("Kick")
+                z.literal("Kick"),
+                z.literal("Rumble")
             ]),
+            videoSource: z.string().default(""), 
+            videoTitle: z.string(),
+            videoId: z.string(),
+            videoThumbUrl: z.string(),
+            slug: z.string(),
+            dateRecorded: z.string(),
+            duration: z.string(),
             communityCreatorId: z.number()
         }))
         .mutation(async ({ input }) => {
-            let intermediateData: IntermediateVodData;
-            
-            switch (input.service) {
-                case "Twitch": intermediateData = await createIntermediateYoutubeData(input.videoId); break;
-                case "Youtube": intermediateData = await createIntermediateYoutubeData(input.videoId); break;
-                case "Kick": intermediateData = await createIntermediateKickData(input.videoId); break;
-            }
-
             return await prisma.communityVod
                 .create({
                     data: {
-                        ...intermediateData,
+                        dateRecorded: input.dateRecorded,
+                        duration: input.duration,
+                        service: input.service,
+                        slug: input.slug,
+                        videoId: input.videoId,
+                        videoThumbUrl: input.videoThumbUrl,
+                        videoTitle: input.videoTitle,
+                        videoSource: input.videoSource,
                         communityCreator: {
                             connect: {
                                 id: input.communityCreatorId
@@ -205,28 +209,41 @@ export const contributor = router({
         .use(authorizeContributor)
         .input(z.object({
             communityVodId: z.number(),
-            video: z.string(),
             service: z.union([
                 z.literal("Twitch"),
                 z.literal("Youtube"),
-                z.literal("Kick")
+                z.literal("Kick"),
+                z.literal("Rumble")
             ]),
+            videoSource: z.string().default(""), 
+            videoTitle: z.string(),
+            videoId: z.string(),
+            videoThumbUrl: z.string(),
+            slug: z.string(),
+            dateRecorded: z.string(),
+            duration: z.string(),
+            communityCreatorId: z.number()
         }))
         .mutation(async ({ input }) => {
-            let intermediateData: IntermediateVodData;
-            
-            switch (input.service) {
-                case "Twitch": intermediateData = await createIntermediateYoutubeData(input.video); break;
-                case "Youtube": intermediateData = await createIntermediateYoutubeData(input.video); break;
-                case "Kick": intermediateData = await createIntermediateKickData(input.video); break;
-            }
             return await prisma.communityVod
                 .update({
                     where: {
                         id: input.communityVodId,
                     },
                     data: {
-                        ...intermediateData
+                        dateRecorded: input.dateRecorded,
+                        duration: input.duration,
+                        service: input.service,
+                        slug: input.slug,
+                        videoId: input.videoId,
+                        videoThumbUrl: input.videoThumbUrl,
+                        videoTitle: input.videoTitle,
+                        videoSource: input.videoSource,
+                        communityCreator: {
+                            connect: {
+                                id: input.communityCreatorId
+                            }
+                        }
                     }
                 })
         }),
@@ -302,91 +319,3 @@ export const contributor = router({
                 });
         })
 });
-
-const createIntermediateYoutubeData = async (videoId: string): Promise<IntermediateVodData> => {
-    const youtubeUrl = new URL("https://youtube.googleapis.com/youtube/v3/videos");
-    youtubeUrl.searchParams.append("part", Array.from(["snippet", "contentDetails", "statistics"]).join(","));
-    youtubeUrl.searchParams.append("id", videoId);
-    youtubeUrl.searchParams.append("key", PUBLIC_GOOGLE_API_KEY);
-    
-    const youtubeRes = await axios.get<Youtube.VideoListResponse>(youtubeUrl.href, {
-        validateStatus: () => true
-    });
-
-    if (youtubeRes.status === 200) {
-        if (youtubeRes.data.items.length === 1) {
-            //if (youtubeRes.data.items[0].snippet.liveBroadcastContent === "live") {
-            //    throw new TRPCError({
-            //        code: "BAD_REQUEST",
-            //        message: "Stream is live - Wait for the stream to end before creating a VOD",
-            //        cause: "Server/tRPC.community.createCommunityVod/createIntermediateYoutubeData/Axios/Result"
-            //    }); 
-            //}
-            return {
-                videoId: youtubeRes.data.items[0].id,
-                videoTitle: youtubeRes.data.items[0].snippet.title,
-                videoThumbUrl: ensureValidThumbnail(youtubeRes.data.items[0].snippet.thumbnails),
-                dateRecorded: youtubeRes.data.items[0].snippet.publishedAt,
-                duration: youtubeRes.data.items[0].contentDetails.duration,
-                slug: youtubeRes.data.items[0].snippet.title.slice(0, 10).trim().replaceAll(/([\s\-_])+/g, "_").concat("-", youtubeRes.data.items[0].id),
-                service: "Youtube",
-            };
-        } else {
-            throw new TRPCError({
-                code: "BAD_REQUEST",
-                message: "Youtube items.length wasn't exactly one(1)",
-                cause: "Server/tRPC.community.createCommunityVod/createIntermediateYoutubeData/Axios/Result"
-            });
-        }
-    } else {
-        throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "Didnt get 200 from YouTube when getting video data",
-            cause: "Server/tRPC.community.createCommunityVod/createIntermediateYoutubeData/Axios"
-        });
-    }
-}
-
-const createIntermediateKickData = async (videoIdOrUrl: string): Promise<IntermediateVodData> => {
-    let videoId: string | null = videoIdOrUrl;
-    if (videoIdOrUrl.match(/^((http(s)?:\/\/)?(www\.)?)?(kick\.com\/video\/).*$/)) {
-        videoId = videoIdOrUrl.split("/")[videoIdOrUrl.split("/").length - 1];
-        if (!videoId) {
-            throw new TRPCError({
-                code: "BAD_REQUEST",
-                message: "Couldnt get id portion of kick URL",
-                cause: "Server/tRPC.community.createCommunityVod/createYoutubeVodEntry/RegEx/Url"
-            });
-        }
-    }
-
-    if (!videoId.match(/^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/)) {
-        throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: `Couldnt match the given kick video id\nInitial: ${videoIdOrUrl}, Parsed: ${videoId}`,
-            cause: "Server/tRPC.community.createCommunityVod/createIntermediateKickData/RegEx/GUID"
-        });
-    }
-
-    const kickRes = await axios.get<Kick.Video>("https://kick.com/api/v1/video/" + videoId, {
-        validateStatus: () => true
-    });
-
-    if (kickRes.status === 200) {
-        return {
-            videoId: kickRes.data.uuid,
-            videoTitle: kickRes.data.livestream.sessionTitle,
-            videoThumbUrl: kickRes.data.livestream.thumbnail,
-            dateRecorded: kickRes.data.livestream.createdAt.toString(),
-            duration: kickRes.data.livestream.duration.toString(),
-            slug: kickRes.data.livestream.sessionTitle.slice(0, 10).trim().replaceAll(/([\s\-_])+/g, "_").concat("-", kickRes.data.id.toString()),
-            service: "Kick",
-        };
-    } else {
-        throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "Didnt get 200 from Kick when getting video data",
-            cause: "Server/tRPC.community.createCommunityVod/createIntermediateKickData/Axios"
-        });
-    }
-}
