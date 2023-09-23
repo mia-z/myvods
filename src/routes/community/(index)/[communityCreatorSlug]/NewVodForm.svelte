@@ -36,20 +36,20 @@
             </label>
             <div class={"tooltip tooltip-info"} data-tip={"Kick coming soon"} >
                 <input disabled id={"check-kick"} name={"service"} type="radio" bind:group={$form.service} value={"Kick"} />
-            </div>
+</div>
         </div>
     </div>
     <div class={"form-control"}>
         <label for={"videoId"} class={"label"}>
             <span class={"label-text"}>Video ID or URL</span>
-            {#if $errors.videoId}
+            {#if $errors.video}
                 <span class={"label-text-alt ml-auto text-error italic"}>
-                    {$errors.videoId}
+                    {$errors.video}
                 </span>
             {/if}
             <span class={"label-text-alt"}></span>
         </label>
-        <input type="text" name={"videoId"} bind:value={$form.videoId} class={"input input-bordered"} />
+        <input type="text" name={"video"} bind:value={$form.video} class={"input input-bordered"} />
     </div>
     {#if $errors._errors}
         <div class={"text-sm text-error italic text-center"}>
