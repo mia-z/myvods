@@ -23,15 +23,12 @@ const newVodFormSchema = z.object({
 });
 
 export const load: PageServerLoad = async (event: PageServerLoadEvent) => {
-    const communityCreatorAndVods = await trpc(event).community.getCommunityCreatorBySlugWithVods.query({
-        slug: event.params.communityCreatorSlug,
-        offset: 0
-    });
+    const communityCreator = await trpc(event).community.getCommunityCreatorBySlug.query(event.params.communityCreatorSlug);
     
-    if (communityCreatorAndVods) {
+    if (communityCreator) {
         const newVodForm = await superValidate(newVodFormSchema);
         return {
-            communityCreatorAndVods,
+            communityCreator,
             newVodForm
         };
     } else {
