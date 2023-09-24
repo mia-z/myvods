@@ -72,21 +72,30 @@ export const community = router({
                     }
                 });
         }),
-    getCommunityVodsByCreatorId: publicProcedure
+    getCommunityCreatorWithVodsAndCount: publicProcedure
         .input(z.object({
             creatorId: z.number(),
-            offset: z.number().default(0)
+            offset: z.number().default(1)
         }))
         .query(async ({ input }) => {
-            return await prisma.communityVod
-                .findMany({
+            return await prisma.communityCreator
+                .findFirst({
                     where: {
-                        communityCreatorId: input.creatorId
+                        id: input.creatorId
                     },
-                    take: 9,
-                    skip: 9 * input.offset,
-                    orderBy: {
-                        dateRecorded: "desc"
+                    select: {
+                        _count: {
+                            select: {
+                                vods: true
+                            }
+                        },
+                        vods: {
+                            take: 9,
+                            skip: 9 * input.offset,
+                            orderBy: {
+                                dateRecorded: "desc"
+                            },
+                        }
                     }
                 });
         }),
@@ -107,6 +116,9 @@ export const community = router({
                     skip: 9 * input.offset,
                     orderBy: {
                         dateRecorded: "desc"
+                    },
+                    include: {
+                        _count: true
                     }
                 });
         }),
