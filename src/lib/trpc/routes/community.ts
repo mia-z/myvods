@@ -8,7 +8,7 @@ export const community = router({
             return await prisma.communityCreator
                 .findMany()
         }),
-    getCommunityCreatorByIdWithVods: publicProcedure
+        getCommunityCreatorByIdWithVods: publicProcedure
         .input(z.object({
             creatorId: z.number(),
             offset: z.number().default(0)
@@ -28,7 +28,27 @@ export const community = router({
                             }
                         }
                     }
-                })
+                });
+        }),
+    getCommunityCreatorBySlug: publicProcedure
+        .input(z.string())
+        .query(async ({ input }) => {
+            return await prisma.communityCreator
+                .findFirst({
+                    where: {
+                        slug: input
+                    }
+                });
+        }),
+    getCommunityCreatorById: publicProcedure
+        .input(z.number())
+        .query(async ({ input }) => {
+            return await prisma.communityCreator
+                .findFirst({
+                    where: {
+                        id: input
+                    }
+                });
         }),
     getCommunityCreatorBySlugWithVods: publicProcedure
         .input(z.object({
@@ -50,7 +70,39 @@ export const community = router({
                             }
                         }
                     }
-                })
+                });
+        }),
+    getCommunityVodsByCreatorId: publicProcedure
+        .input(z.object({
+            creatorId: z.number(),
+            offset: z.number().default(0)
+        }))
+        .query(async ({ input }) => {
+            return await prisma.communityVod
+                .findMany({
+                    where: {
+                        communityCreatorId: input.creatorId
+                    },
+                    take: 9,
+                    skip: 9 * input.offset
+                });
+        }),
+    getCommunityVodsByCreatorSlug: publicProcedure
+        .input(z.object({
+            slug: z.string(),
+            offset: z.number().default(0)
+        }))
+        .query(async ({ input }) => {
+            return await prisma.communityVod
+                .findMany({
+                    where: {
+                        communityCreator: {
+                            slug: input.slug
+                        }
+                    },
+                    take: 9,
+                    skip: 9 * input.offset
+                });
         }),
     getCommunityVodByIdWithAnnotations: publicProcedure
         .input(z.number())
@@ -63,7 +115,7 @@ export const community = router({
                     include: {
                         annotations: true
                     }
-                })
+                });
         }),
     getCommunityVodBySlugWithAnnotations: publicProcedure
         .input(z.string())
@@ -76,6 +128,6 @@ export const community = router({
                     include: {
                         annotations: true
                     }
-                })
+                });
         })
 });
