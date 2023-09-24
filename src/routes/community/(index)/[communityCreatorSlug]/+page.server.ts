@@ -3,7 +3,6 @@ import { error, type Actions, fail } from "@sveltejs/kit";
 import type { PageServerLoad, PageServerLoadEvent } from "./$types";
 import { z } from "zod";
 import { message, setError, superValidate } from "sveltekit-superforms/client";
-import prisma from "$lib/server/Prisma";
 import { TRPCClientError } from "@trpc/client";
 import type { CommunityVod } from "@prisma/client";
 import axios from "axios";
@@ -46,6 +45,7 @@ export const actions = {
         }
 
         let intermediateVodData: IntermediateVodData;
+
         switch(newVodForm.data.service) {
             case "Twitch": throw new Error("Not implemented");
             case "Youtube": {
@@ -90,6 +90,8 @@ export const actions = {
             case "Rumble": throw new Error("Not implemented");
             default: throw new Error("Unable to determine video service");
         }
+
+        //can check if videoId from intermediate data is duplicate here !
 
         try {
             await trpc(event).contributor.createCommunityVod.mutate(intermediateVodData);
