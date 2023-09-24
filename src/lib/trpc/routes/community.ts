@@ -23,21 +23,32 @@ export const community = router({
                         vods: {
                             take: 9,
                             skip: input.offset * 9,
-                            
+                            orderBy: {
+                                dateRecorded: "desc"
+                            }
                         }
                     }
                 })
         }),
     getCommunityCreatorBySlugWithVods: publicProcedure
-        .input(z.string())
+        .input(z.object({
+            slug: z.string(),
+            offset: z.number().default(0)
+        }))
         .query(async ({ input }) => {
             return await prisma.communityCreator
                 .findFirst({
                     where: {
-                        slug: input
+                        slug: input.slug
                     },
                     include: {
-                        vods: true
+                        vods: {
+                            take: 9,
+                            skip: input.offset * 9,
+                            orderBy: {
+                                dateRecorded: "desc"
+                            }
+                        }
                     }
                 })
         }),
