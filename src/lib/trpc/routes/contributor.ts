@@ -1,13 +1,9 @@
 import { z } from "zod";
 import prisma from "$lib/server/Prisma";
-import { PUBLIC_GOOGLE_API_KEY } from "$env/static/public";
 import { SECRET_JWT_SECRET } from "$env/static/private";
 import { DateTime } from "luxon";
 import { router, publicProcedure, contributorProcedure, authorizeContributor } from "../t";
 import { TRPCError } from "@trpc/server";
-import axios from "axios";
-import { ensureValidThumbnail } from "$lib/utils/YoutubeHelper";
-import type { CommunityVod } from "@prisma/client";
 import bcrypt from "bcrypt";
 import JWT from "jsonwebtoken";
 import { v4 as uuid } from "uuid";
