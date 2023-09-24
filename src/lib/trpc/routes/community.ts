@@ -9,15 +9,22 @@ export const community = router({
                 .findMany()
         }),
     getCommunityCreatorByIdWithVods: publicProcedure
-        .input(z.number())
+        .input(z.object({
+            creatorId: z.number(),
+            offset: z.number().default(0)
+        }))
         .query(async ({ input }) => {
             return await prisma.communityCreator
                 .findFirst({
                     where: {
-                        id: input
+                        id: input.creatorId
                     },
                     include: {
-                        vods: true
+                        vods: {
+                            take: 9,
+                            skip: input.offset * 9,
+                            
+                        }
                     }
                 })
         }),
