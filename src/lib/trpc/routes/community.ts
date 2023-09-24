@@ -84,7 +84,10 @@ export const community = router({
                         communityCreatorId: input.creatorId
                     },
                     take: 9,
-                    skip: 9 * input.offset
+                    skip: 9 * input.offset,
+                    orderBy: {
+                        dateRecorded: "desc"
+                    }
                 });
         }),
     getCommunityVodsByCreatorSlug: publicProcedure
@@ -101,7 +104,10 @@ export const community = router({
                         }
                     },
                     take: 9,
-                    skip: 9 * input.offset
+                    skip: 9 * input.offset,
+                    orderBy: {
+                        dateRecorded: "desc"
+                    }
                 });
         }),
     getCommunityVodByIdWithAnnotations: publicProcedure
