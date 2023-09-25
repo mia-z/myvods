@@ -75,7 +75,7 @@ export const actions = {
                             videoThumbUrl: ensureValidThumbnail(youtubeRes.data.items[0].snippet.thumbnails),
                             dateRecorded: youtubeRes.data.items[0].snippet.publishedAt,
                             duration: youtubeRes.data.items[0].contentDetails.duration,
-                            slug: youtubeRes.data.items[0].snippet.title.slice(0, 10).trim().replaceAll(/[^a-zA-Z0-9-_\s]/g, "").replaceAll(/([\s\-_])+/g, "_").concat("-", youtubeRes.data.items[0].id),
+                            slug: youtubeRes.data.items[0].snippet.title.slice(0, 20).trim().replaceAll(/[^a-zA-Z0-9-_\s]/g, "").replaceAll(/([\s\-_])+/g, "_").concat("-", youtubeRes.data.items[0].id),
                             service: "Youtube",
                         };
                     } else {
