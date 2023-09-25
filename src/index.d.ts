@@ -107,6 +107,21 @@ declare namespace Google {
         type: string;
         id: string;
     }
+    interface Spreadsheet {
+        properties: any;
+        sheets: Sheet[]
+    }
+    interface Sheet {
+        sheetId: number;
+        title: string;
+        index: number;
+        sheetType: string;
+    }
+    interface SheetValues {
+        range: string;
+        majorDimension: string;
+        values: Array<Array<string>>
+    }
 }
 
 declare namespace YT {
