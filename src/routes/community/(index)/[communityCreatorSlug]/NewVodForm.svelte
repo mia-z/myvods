@@ -10,7 +10,7 @@
     const { form, errors, enhance, submitting, message } = superForm(data.newVodForm);
 
     onMount(() => {
-        $form.communityCreatorId = data.communityCreatorAndVods.id;
+        $form.communityCreatorId = data.communityCreator.id;
     });
 </script>
 
