@@ -1,113 +1,113 @@
-datasource db {
-    provider            = "postgresql"
-    url                 = env("POSTGRES_PRISMA_URL")
-    directUrl           = env("POSTGRES_URL_NON_POOLING")
+generator client {
+  provider = "prisma-client-js"
 }
 
-generator client {
-    provider = "prisma-client-js"
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
 model User {
-    id                  Int @id @default(autoincrement())
-    displayName         String
-    oauthConnections    OAuthConnection[]
-    tokens              LoginToken[]
-    vods                Vod[]
+  id               Int               @id @default(autoincrement())
+  displayName      String
+  tokens           LoginToken[]
+  oauthConnections OAuthConnection[]
+  vods             Vod[]
 }
 
 model LoginToken {
-    id          Int @id @default(autoincrement())
-    token       String
-    expires     DateTime
-    userId      Int
-    user        User @relation(fields: [userId], references: [id])
+  id      Int      @id @default(autoincrement())
+  token   String
+  expires DateTime
+  userId  Int
+  user    User     @relation(fields: [userId], references: [id])
 }
 
 model OAuthConnection {
-    id              Int @id @default(autoincrement())
-    accountId       String
-    authCode        String
-    refreshToken    String
-    userId          Int
-    user            User @relation(fields: [userId], references: [id])
-    provider        OAuthProvider
+  id           Int           @id @default(autoincrement())
+  accountId    String
+  authCode     String
+  refreshToken String
+  userId       Int
+  provider     OAuthProvider
+  user         User          @relation(fields: [userId], references: [id])
 }
 
 model Vod {
-    id              Int @id @default(autoincrement())
-    provider        VideoService
-    link            String
-    userId          Int
-    user            User @relation(fields: [userId], references: [id])
+  id       Int          @id @default(autoincrement())
+  provider VideoService
+  link     String
+  userId   Int
+  user     User         @relation(fields: [userId], references: [id])
 }
 
 model ContributorToken {
-    id              Int @id @default(autoincrement())
-    token           String
-    expires         DateTime
-    contributorID   Int
-    contributor     CommunityContributor @relation(fields: [contributorID], references: [id])
+  id            Int                  @id @default(autoincrement())
+  token         String
+  expires       DateTime
+  contributorID Int
+  contributor   CommunityContributor @relation(fields: [contributorID], references: [id])
 }
 
 model CommunityContributor {
-    id              Int @id @default(autoincrement())
-    nick            String
-    password        String
-    tokens          ContributorToken[]
-    permissions     CommunityCreator[]
-    power           Int @default(100)
+  id          Int                @id @default(autoincrement())
+  nick        String
+  password    String
+  power       Int                @default(100)
+  tokens      ContributorToken[]
+  permissions CommunityCreator[] @relation("CommunityContributorToCommunityCreator")
 }
 
 model CommunityCreator {
-    id              Int @id @default(autoincrement())
-    name            String
-    slug            String @unique
-    imageLink       String?
-    description     String?
-    vods            CommunityVod[]
-    allowedUsers    CommunityContributor[]
+  id           Int                    @id @default(autoincrement())
+  name         String
+  slug         String                 @unique
+  imageLink    String?
+  description  String?
+  vods         CommunityVod[]
+  allowedUsers CommunityContributor[] @relation("CommunityContributorToCommunityCreator")
 }
 
 model CommunityVod {
-    id                  Int @id @default(autoincrement())
-    service             VideoService
-    videoSource         String
-    videoTitle          String
-    videoId             String @unique
-    videoThumbUrl       String
-    slug                String
-    dateRecorded        String
-    duration            String
-    communityCreatorId  Int
-    communityCreator    CommunityCreator @relation(fields: [communityCreatorId], references: [id])
-    annotations         CommunityVodAnnotation[]
+  id                 Int                      @id @default(autoincrement())
+  service            VideoService
+  videoSource        String
+  videoTitle         String
+  videoId            String                   @unique
+  videoThumbUrl      String
+  slug               String
+  dateRecorded       String
+  duration           String
+  communityCreatorId Int
+  communityCreator   CommunityCreator         @relation(fields: [communityCreatorId], references: [id])
+  annotations        CommunityVodAnnotation[]
 }
 
 model CommunityVodAnnotation {
-    id              Int @id @default(autoincrement())
-    note            String?
-    subject         String?
-    game            String?
-    timestamp       Int
-    communityVodId  Int
-    communityVod    CommunityVod @relation(fields: [communityVodId], references: [id])
+  id             Int          @id @default(autoincrement())
+  note           String?
+  subject        String?
+  game           String?
+  timestamp      Int
+  communityVodId Int
+  communityVod   CommunityVod @relation(fields: [communityVodId], references: [id])
 }
 
 enum ImageType {
-    THUMBNAIL
-    COVER
-    DEFAULT
+  THUMBNAIL
+  COVER
+  DEFAULT
 }
 
 enum VideoService {
-    Youtube
-    Twitch
-    Kick
-    Rumble
+  Youtube
+  Twitch
+  Kick
+  Rumble
 }
 
 enum OAuthProvider {
-    GOOGLE
-    TWITCH
+  GOOGLE
+  TWITCH
 }
